@@ -20,5 +20,7 @@ jobs:
           cache: npm
       - name: Install
         run: npm ci
+      - name: Test
+        run: npm test
       - name: Build (TypeScript + Vite)
         run: npm run build
