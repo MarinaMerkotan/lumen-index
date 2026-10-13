@@ -1,15 +1,17 @@
 name: CI
 
+# Temporarily disabled while GitHub Actions is blocked by account billing.
+# To re-enable, restore push/pull_request triggers and remove the job-level 'if: false'.
+# The commands below are intentionally preserved for later use.
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   build:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
