@@ -17,10 +17,13 @@ button { font: inherit; border: 0; background: none; cursor: pointer; }
 a { text-decoration: none; }
 ul { list-style: none; }
 
-.font-graphik { font-family: 'Graphik LCG Regular Regular', 'Graphik LCG', 'Helvetica Neue', Arial, sans-serif; }
+/* Hanken Grotesk (SIL OFL 1.1) replaces the license-unconfirmed Graphik webfont; 340 matches Graphik Regular's weight. */
+.font-display { font-family: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif; font-weight: 340; }
 .font-manrope { font-family: 'Manrope', 'Helvetica Neue', Arial, sans-serif; }
 
 /* ---------- Accessibility ---------- */
+/* Decorative geometry and labels never get caught in text selection; data stays selectable. */
+[aria-hidden="true"], .grid-lens, .hero-live-line, .status-dot { -webkit-user-select: none; user-select: none; }
 :focus-visible { outline: 1px solid rgb(var(--ice)); outline-offset: 4px; }
 section:focus-visible, main:focus-visible, footer:focus-visible { outline: none; }
 
@@ -216,7 +219,7 @@ html[data-motion="off"] .grid-lens { opacity: 0; }
 }
 .ambient-live .curve-signal { animation: curveSignal var(--dur) ease-in-out var(--delay) infinite; }
 .curve-label { fill: rgb(255 255 255 / 0.4); font-family: 'Manrope', sans-serif; font-size: 6.5px; letter-spacing: 0.08em; }
-.curve-formula { fill: rgb(var(--ice)); font-family: 'Graphik LCG Regular Regular', 'Graphik LCG', sans-serif; font-size: 10px; }
+.curve-formula { fill: rgb(var(--ice)); font-family: 'Hanken Grotesk', sans-serif; font-size: 10px; }
 
 .poll-track { transition: border-color 0.4s var(--ease-out); }
 .poll-option:hover .poll-track { border-color: rgb(var(--ice) / 0.4); }
@@ -366,10 +369,22 @@ html[data-motion="off"] .poll-fill { transition: none; }
 
 .lab-message {
   margin: 0; padding: 14px 16px; border: 1px solid rgb(255 255 255 / 0.14); background: rgb(0 0 0 / 0.45);
-  font-family: 'Manrope', sans-serif; font-size: 12px; line-height: 19px; color: rgb(255 255 255 / 0.85);
+  font-family: 'Manrope', sans-serif; font-size: 13px; line-height: 20px; color: rgb(255 255 255 / 0.88);
   white-space: pre-wrap; overflow-wrap: anywhere; font-variant-numeric: tabular-nums;
 }
-.lab-consent { width: 14px; height: 14px; accent-color: rgb(var(--ice)); flex-shrink: 0; }
+.lab-result { padding: 14px 16px; border: 1px solid rgb(255 255 255 / 0.12); border-left-width: 2px; background: rgb(0 0 0 / 0.35); }
+.lab-result[data-tone="ok"] { border-left-color: rgb(var(--ice)); }
+.lab-result[data-tone="warn"] { border-left-color: rgb(255 255 255 / 0.45); }
+.lab-details summary { list-style: none; }
+.lab-details summary::-webkit-details-marker { display: none; }
+.lab-details summary::before { content: "+ "; color: rgb(var(--ice)); }
+.lab-details[open] summary::before { content: "− "; }
+.lab-consent { width: 16px; height: 16px; accent-color: rgb(var(--ice)); flex-shrink: 0; }
+
+/* Touch devices: compact inline text actions (copy, Etherscan, reset, retry...) get a usable hit area. */
+@media (pointer: coarse) {
+  main :is(button, a)[class*="inline-flex"]:not(.wallet-cta), header .wallet-control button:not(.wallet-cta) { min-height: 40px; }
+}
 
 /* ---------- Reduced motion: no continuous motion, entrances resolve instantly ---------- */
 @media (prefers-reduced-motion: reduce) {

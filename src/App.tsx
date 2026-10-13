@@ -12,6 +12,7 @@ import { EcosystemSection } from './features/ecosystem/EcosystemSection';
 import { GovernanceSection } from './features/governance/GovernanceSection';
 import { LiquiditySection } from './features/liquidity/LiquiditySection';
 import { useActiveSection } from './hooks/useActiveSection';
+import { useInitialHashScroll } from './hooks/useInitialHashScroll';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
 
 function Page() {
   const activeId = useActiveSection(SECTION_IDS);
+  useInitialHashScroll();
 
   return (
     <>

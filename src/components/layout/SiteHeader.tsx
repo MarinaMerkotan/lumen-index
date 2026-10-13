@@ -27,7 +27,7 @@ export function SiteHeader({ activeId }: { activeId: string | null }) {
         <div className="flex items-center gap-[40px]">
           <a
             href="#top"
-            className="font-graphik text-white text-[18px] md:text-[21px] leading-[21px] whitespace-nowrap anim-fade-up"
+            className="font-display text-white text-[18px] md:text-[21px] leading-[21px] whitespace-nowrap anim-fade-up"
             style={{ animationDelay: '200ms' }}
           >
             LŪMEN // ÍNDEX

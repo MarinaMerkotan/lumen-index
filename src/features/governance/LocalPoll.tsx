@@ -27,7 +27,7 @@ export function LocalPoll() {
         <p className="font-manrope text-white text-[13px] leading-[18px]">PROPOSAL // EXAMPLE-01</p>
         <StatusTag state="demo" detail="NOT ON-CHAIN" />
       </div>
-      <h3 className="mt-3 font-graphik text-white text-[20px] leading-[26px]">Keep the interface monochrome with a single ice-blue accent.</h3>
+      <h3 className="mt-3 font-display text-white text-[20px] leading-[26px]">Keep the interface monochrome with a single ice-blue accent.</h3>
       <p className="mt-2 font-manrope text-white/55 text-[13px] leading-[19px]">
         An illustrative, harmless proposal used to demonstrate a voting flow. It has no author, no quorum and no effect.
       </p>

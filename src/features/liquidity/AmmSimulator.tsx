@@ -150,6 +150,9 @@ export function AmmSimulator() {
       </div>
 
       <figure className="mt-7" aria-label="Constant-product curve with the pool state before and after the simulated swap">
+        <p className="mb-2 font-manrope text-[11px] leading-[14px] tracking-[0.06em] text-white/45 select-none" aria-hidden="true">
+          ↑ RESERVE B
+        </p>
         <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="w-full h-auto overflow-visible" aria-hidden="true">
           <line x1="0" y1={VIEW_H} x2={VIEW_W} y2={VIEW_H} className="curve-axis" />
           <line x1="0" y1="0" x2="0" y2={VIEW_H} className="curve-axis" />
@@ -166,14 +169,11 @@ export function AmmSimulator() {
               </g>
             </>
           )}
-          <text x={VIEW_W} y={VIEW_H + 14} textAnchor="end" className="curve-label">
-            RESERVE A
-          </text>
-          <text x="6" y="-4" className="curve-label">
-            RESERVE B
-          </text>
         </svg>
-        <figcaption className="mt-5 flex flex-wrap gap-x-5 gap-y-1 font-manrope text-[11px] leading-[16px] tracking-[0.04em] text-white/45">
+        <p className="mt-2 text-right font-manrope text-[11px] leading-[14px] tracking-[0.06em] text-white/45 select-none" aria-hidden="true">
+          RESERVE A →
+        </p>
+        <figcaption className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-manrope text-[11px] leading-[16px] tracking-[0.04em] text-white/45">
           <span>
             <span className="inline-block w-[7px] h-[7px] rounded-full bg-white/70 mr-[6px]" aria-hidden="true" />
             BEFORE
@@ -202,7 +202,7 @@ export function AmmSimulator() {
                 {
                   label: 'You would receive',
                   value: (
-                    <span className="font-graphik text-[20px] leading-[24px] tabular-nums">
+                    <span className="font-display text-[20px] leading-[24px] tabular-nums">
                       {fmt(quote.amountOut)} <span className="text-white/55 text-[13px]">{SYMBOL[tokenOut]}</span>
                     </span>
                   ),

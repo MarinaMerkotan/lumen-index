@@ -58,5 +58,14 @@ Each milestone is intended for **one bounded agent task / PR**. Do not skip ahea
 
 **Acceptance:** interactive demo sections correctly distinguish simulation/live; no financial transactions or storage; touch/mobile/responsive, reduced motion, keyboard, errors and build are checked.
 
+## M4 — Final polish & release preparation
+- [x] Visual/UX pass: Signature Lab readability, compact signature with copy + expandable value, AMM axis labels readable on mobile, touch-sized inline actions on coarse pointers, decorative elements non-selectable.
+- [x] Branding: custom SVG favicon, accurate title/description, Open Graph + Twitter summary metadata, theme colour; Vite template assets removed. No canonical URL or social image until the production domain is confirmed.
+- [x] Fonts: license-unconfirmed Graphik webfont replaced by Hanken Grotesk (OFL); Manrope kept (OFL).
+- [x] Security/dependency review: read-only guarantees, single consent-gated signature, CSPRNG challenge, no persistence; `npm audit fix` applied (non-breaking patch only); remaining dev-only advisories documented.
+- [x] Deployment notes for Vercel (static Vite, `dist`), smoke-test steps in README.
+- [ ] **Owner:** confirm hero video rights (or supply a licensed replacement).
+- [ ] **Owner:** real-wallet QA with a throwaway wallet; cross-browser check (Firefox, Safari); production smoke test after first deploy.
+
 ## Notes for reviewers
 Review feature scope first, then technical correctness, security/privacy, visual fidelity and release test evidence. Do not merge a milestone PR solely on green build; wallet and motion require manual browser QA.

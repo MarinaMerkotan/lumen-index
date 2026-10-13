@@ -80,6 +80,10 @@ describe('SignatureLab', () => {
     expect(wallet.sign).toHaveBeenCalledTimes(1);
     expect(wallet.sign.mock.calls[0][0]).toEqual({ account: signer.address, message: first });
     expect(container.textContent).toContain('VERIFIED LOCALLY');
+    const signature = (await wallet.sign.mock.results[0].value) as string;
+    expect(container.textContent).toContain(`${signature.slice(0, 12)}…${signature.slice(-8)}`);
+    expect(container.querySelector('[aria-label="Copy full signature"]')).not.toBeNull();
+    expect(container.querySelector('details code')!.textContent).toBe(signature);
     act(() => void button('CLEAR RESULT')!.click());
     expect(container.textContent).not.toContain('VERIFIED LOCALLY');
     expect(container.querySelector('pre')!.textContent).not.toBe(first);

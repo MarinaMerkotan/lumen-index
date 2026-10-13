@@ -57,7 +57,7 @@ export function HeroMedia() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload={motionEnabled ? 'auto' : 'metadata'}
           disablePictureInPicture
           tabIndex={-1}
           onLoadedData={() => setStatus('ready')}
