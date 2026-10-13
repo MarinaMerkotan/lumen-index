@@ -25,7 +25,7 @@ export function BlockDetail({ number, onClose, onInspectTx }: BlockDetailProps) 
       <div className="flex items-start justify-between gap-3 mb-2">
         <div>
           <p className="font-manrope text-white/45 text-[11px] leading-[14px] tracking-[0.06em]">SELECTED BLOCK</p>
-          <p className="font-graphik text-white text-[22px] leading-[28px] tabular-nums">#{formatBlockNumber(number)}</p>
+          <p className="font-display text-white text-[22px] leading-[28px] tabular-nums">#{formatBlockNumber(number)}</p>
         </div>
         <button type="button" onClick={onClose} aria-label="Close block details" className="w-[28px] h-[28px] flex items-center justify-center text-white/60 hover:text-white">
           <X className="w-[14px] h-[14px]" strokeWidth={1.5} aria-hidden="true" />

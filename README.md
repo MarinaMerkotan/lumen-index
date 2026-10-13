@@ -2,7 +2,7 @@
 
 An immersive, **frontend-only Web3 engineering showcase**. Built to demonstrate wallet connectivity, public blockchain reads, transparent demo simulations, and refined motion design.
 
-> **Project status:** Milestone 3B (interactive labs) on top of M3A (blockchain & asset explorer) and M2 (read-only Web3). Live Ethereum Mainnet telemetry and a user-initiated injected-wallet connection are real. Liquidity Pools and Governance are local demos. Nothing writes to a chain; the only signature request is the opt-in message in the Signature Lab; no wallet data is stored. This is not a bank, investment service, or deployed DeFi protocol.
+> **Project status:** feature-complete portfolio release candidate (M1–M4). Live read-only Ethereum Mainnet data, explorers and user-initiated wallet access are real; Liquidity Pools and Governance are clearly labelled local demos; the only signature request is the opt-in Signature Lab message. Nothing writes to a chain and no wallet data is stored. This is not a bank, investment service, or deployed DeFi protocol. **Open release blocker:** hero video rights (see *Assets and privacy*).
 
 ## What ships today
 - **Liquidity Pools (DEMO — NO FUNDS):** a local constant-product (x · y = k) simulator with editable reserves, swap amount, direction and illustrative fee (default 0.3%). Shows output, spot price before/after, price impact and new reserves, with an SVG curve whose before/after points move with the inputs. Bigint fixed-point math (18 decimals), strict input validation, reset to defaults.
@@ -63,9 +63,22 @@ npm run preview
 No backend, database, credentials, or wallet are needed to run the current build.
 
 ## Assets and privacy
-The initial hero video is loaded from a third-party CloudFront URL and the initial fonts from Google Fonts / an external font stylesheet. Confirm asset usage rights and arrange a durable, licensed hosting strategy before public launch. Third parties may receive standard browser requests. See `docs/SECURITY.md`.
+- **Hero video (release blocker):** streamed from a third-party CloudFront URL (`HeroMedia.tsx`, MP4 ~7.4 MB). Ownership and licence are **not confirmed**; it is not copied into the repo. A static luminous fallback appears if it fails or stalls, and it does not autoplay under reduced motion. Confirm rights or provide an owned replacement before public launch.
+- **Fonts:** Hanken Grotesk (display, weight 340) and Manrope (UI), both SIL OFL 1.1 via Google Fonts. The earlier Graphik webfont from onlinewebfonts.com was removed because its licence could not be confirmed.
+- **Third parties:** the public RPC (`https://ethereum-rpc.publicnode.com`) sees visitor IP addresses and every query, including connected, inspected or looked-up addresses and hashes. Google Fonts and the video CDN receive standard requests. Wallet extensions see the requests this site makes. No analytics, cookies or app-side storage.
+- Override the RPC with an **https** `VITE_MAINNET_RPC_URL` (see `.env.example`); every `VITE_*` value ships to browsers, so never put an API key or secret there.
 
-Chain reads go to the keyless public RPC `https://ethereum-rpc.publicnode.com` (PublicNode), which sees visitor IP addresses and the queries made, including the public address once a wallet is connected. Override it with an **https** `VITE_MAINNET_RPC_URL` (see `.env.example`); every `VITE_*` value ships to browsers, so never put an API key or secret there. Wallet extensions see the requests this site makes. The app sets wagmi `storage: null` and `reconnectOnMount={false}`, so it persists no wallet or connection state.
+## Deployment (Vercel, static)
+- Framework preset: **Vite**. Build command: `npm run build`. Output directory: `dist`. Install: `npm ci`. Node 22 (matches CI).
+- Single-page app with in-page `#anchors` only: no client-side routes, no rewrites and no serverless functions needed. A refresh on any `#section` URL serves `index.html`.
+- No environment variables are required. Optional: `VITE_MAINNET_RPC_URL` (public https URL only).
+- Production smoke test after deploy: open the site in a private window → hero video plays (or fallback appears) → Ecosystem shows `LIVE` with a block number advancing every ~12 s → pick a block and inspect its first transaction → Explore Address with any public address shows ETH/USDC/DAI/WETH → AMM output updates while typing → cast/reset a local vote → without a wallet, CONNECT WALLET opens the "No wallet detected" help → with a throwaway wallet: connect, switch network, sign the lab message (verified), disconnect → reload a `#governance` URL.
+
+## Known limitations
+- Signature Lab verifies ordinary accounts (EOAs) only; smart-contract wallet signatures (ERC-1271/6492) are reported as "not verifiable locally".
+- ERC-20 balances cover the verified allowlist (USDC, DAI, WETH); other tokens in transaction logs are shown in raw base units. No ENS, no other networks, no WalletConnect.
+- Data depends on one public RPC; outages show `ERROR` / `STALE` with retry rather than switching providers.
+- `npm audit`: 0 production vulnerabilities; 13 development-only advisories (Vite 5 / esbuild dev server, Vitest 2 / tinypool, Tailwind 3 tooling chain). Fixes require major upgrades (Vite 8, Vitest 5, Tailwind 4) and none ship in the static bundle.
 
 ## Agent handoff
 Start with [AGENTS.md](AGENTS.md) and the documentation below:

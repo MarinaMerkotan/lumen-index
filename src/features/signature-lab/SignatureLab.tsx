@@ -3,6 +3,7 @@ import { PenLine, RotateCcw } from 'lucide-react';
 import { StatusTag } from '../../components/ui/StatusTag';
 import { usePulse } from '../../hooks/usePulse';
 import { WalletControl } from '../wallet/WalletControl';
+import { SignatureValue } from './SignatureValue';
 import { useSignatureLab } from './useSignatureLab';
 
 const ACTION = 'inline-flex items-center gap-[6px] font-manrope text-[13px] leading-[16px] transition-colors';
@@ -67,17 +68,17 @@ export function SignatureLab() {
             )}
 
             {state.phase === 'verified' && (
-              <div className="mt-5 space-y-2">
+              <div className="lab-result mt-5 space-y-2" data-tone="ok">
                 <StatusTag state="live" label="VERIFIED LOCALLY" />
                 <p className={`${NOTE} text-white/70`}>
                   The recovered signer <span className="tabular-nums text-white break-all">{state.recovered}</span> matches your connected address.
                   Verified in this browser with viem; nothing was sent.
                 </p>
-                <p className="font-manrope text-white/40 text-[11px] leading-[16px] break-all tabular-nums">SIGNATURE {state.signature}</p>
+                <SignatureValue signature={state.signature} />
               </div>
             )}
             {state.phase === 'mismatch' && (
-              <div className="mt-5 space-y-2">
+              <div className="lab-result mt-5 space-y-2" data-tone="warn">
                 <StatusTag state="stale" label="NOT VERIFIABLE LOCALLY" />
                 <p className={`${NOTE} text-white/70`}>
                   {state.recovered

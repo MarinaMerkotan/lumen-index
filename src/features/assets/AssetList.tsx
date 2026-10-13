@@ -47,7 +47,7 @@ export function AssetList({ address }: { address: `0x${string}` }) {
           </span>
           <span className="text-right">
             {eth.state === 'live' && eth.wei !== null ? (
-              <span className="font-graphik text-white text-[18px] leading-[22px] tabular-nums">{formatEthAmount(eth.wei)}</span>
+              <span className="font-display text-white text-[18px] leading-[22px] tabular-nums">{formatEthAmount(eth.wei)}</span>
             ) : eth.state === 'error' ? (
               <Retry onClick={eth.retry} />
             ) : (
@@ -74,7 +74,7 @@ export function AssetList({ address }: { address: `0x${string}` }) {
               <span className="text-right">
                 {row?.state === 'ok' ? (
                   <>
-                    <span className="font-graphik text-white text-[18px] leading-[22px] tabular-nums">{formatTokenAmount(row.balance, token.decimals)}</span>
+                    <span className="font-display text-white text-[18px] leading-[22px] tabular-nums">{formatTokenAmount(row.balance, token.decimals)}</span>
                     {row.totalSupply !== null && (
                       <span className="block text-white/35 text-[11px] leading-[14px] tabular-nums">
                         supply {formatTokenAmount(row.totalSupply, token.decimals, 0)}

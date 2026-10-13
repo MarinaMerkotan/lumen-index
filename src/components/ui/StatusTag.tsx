@@ -9,8 +9,6 @@ const TONE: Record<DataState, string> = {
   unavailable: 'border-white/15 text-white/45',
   loading: 'border-white/25 text-white/70',
   error: 'border-[#ffb4a8]/60 text-[#ffb4a8]',
-  next: 'border-ice bg-ice text-black',
-  planned: 'border-white/20 text-white/60',
 };
 
 interface StatusTagProps {

@@ -10,9 +10,7 @@ export type DataState =
   | 'disconnected'
   | 'unavailable'
   | 'loading'
-  | 'error'
-  | 'next'
-  | 'planned';
+  | 'error';
 
 export const DATA_STATE_LABEL: Record<DataState, string> = {
   live: 'LIVE',
@@ -23,8 +21,6 @@ export const DATA_STATE_LABEL: Record<DataState, string> = {
   unavailable: 'UNAVAILABLE',
   loading: 'LOADING',
   error: 'ERROR',
-  next: 'COMING NEXT',
-  planned: 'PLANNED',
 };
 
 export const DATA_STATE_MEANING: Record<DataState, string> = {
@@ -36,6 +32,4 @@ export const DATA_STATE_MEANING: Record<DataState, string> = {
   unavailable: 'No data source is wired up, or the source failed.',
   loading: 'A request is in flight.',
   error: 'The request failed. Nothing is substituted.',
-  next: 'Arrives in the next milestone. Not functional yet.',
-  planned: 'Scheduled for a later milestone. Not functional yet.',
 };

@@ -44,6 +44,12 @@ describe('security boundaries', () => {
     expect(SOURCES['./features/signature-lab/message.ts']).toMatch(/does NOT authorize any transaction, token transfer, approval or access to funds/);
   });
 
+  it('opens every external link without opener access', () => {
+    const anchors = files.flatMap(([path, source]) => [...source.matchAll(/<a\b[^>]*?target="_blank"[^>]*>/gs)].map((m) => [path, m[0]] as const));
+    expect(anchors.length).toBeGreaterThan(5);
+    expect(anchors.filter(([, tag]) => !tag.includes('rel="noopener noreferrer"')).map(([path]) => path)).toEqual([]);
+  });
+
   it('reads ERC-20 data only through view functions', () => {
     expect(SOURCES['./features/assets/tokenBalances.ts']).toContain("['balanceOf', 'decimals', 'totalSupply']");
   });

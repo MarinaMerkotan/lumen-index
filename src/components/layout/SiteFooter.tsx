@@ -13,7 +13,7 @@ export function SiteFooter() {
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <p className="font-manrope text-ice/80 text-[13px] leading-[15.6px]">[ BOUNDARIES ]</p>
-          <h2 id="disclosure-title" className="font-graphik text-white text-[28px] md:text-[34px] leading-[1.1] mt-6 max-w-[360px]">
+          <h2 id="disclosure-title" className="font-display text-white text-[28px] md:text-[34px] leading-[1.1] mt-6 max-w-[360px]">
             What this site is, and is not.
           </h2>
         </div>

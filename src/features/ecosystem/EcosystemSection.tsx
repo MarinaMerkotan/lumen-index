@@ -71,9 +71,9 @@ function BlockHeights({ block, highlight }: { block: BlockSnapshot | null; highl
           );
         })}
       </div>
-      {heights && (
-        <div className="relative h-[16px] mt-2 font-manrope text-[11px] leading-[16px] tabular-nums hidden sm:block" aria-hidden="true">
-          {heights.map((height, i) => {
+      <div className="relative h-[16px] mt-2 font-manrope text-[11px] leading-[16px] tabular-nums hidden sm:block" aria-hidden="true">
+        {heights &&
+          heights.map((height, i) => {
             const position = i / (HEIGHTS - 1);
             return (
               <span
@@ -85,8 +85,7 @@ function BlockHeights({ block, highlight }: { block: BlockSnapshot | null; highl
               </span>
             );
           })}
-        </div>
-      )}
+      </div>
       <figcaption className="font-manrope text-white/45 text-[11px] leading-[16px] tracking-[0.06em] mt-3">
         {heights ? `LATEST ${HEIGHTS} HEIGHTS (LAST 4 DIGITS) — A NEW BLOCK ROUGHLY EVERY 12 S` : 'BLOCK HEIGHTS APPEAR WHEN THE RPC RESPONDS'}
       </figcaption>
@@ -128,12 +127,12 @@ function telemetryRows(t: ChainTelemetry) {
       ) : (
         DASH
       ),
-      note: block ? 'Opens the block on Etherscan.' : undefined,
+      note: block ? 'Opens the block on Etherscan.' : 'Waiting for the RPC.',
     },
     {
       label: 'Base fee',
       value: block?.baseFeePerGas != null ? `${formatGasGwei(block.baseFeePerGas)} gwei` : DASH,
-      note: block ? 'Protocol base fee from the latest block header.' : undefined,
+      note: block ? 'Protocol base fee from the latest block header.' : 'Waiting for the RPC.',
     },
     {
       label: 'Priority tip',
@@ -143,7 +142,7 @@ function telemetryRows(t: ChainTelemetry) {
           ? 'Suggested by the RPC (eth_maxPriorityFeePerGas). An estimate.'
           : block
             ? 'Not reported reliably right now.'
-            : undefined,
+            : 'Waiting for the RPC.',
     },
     {
       label: 'Block fullness',
@@ -153,7 +152,10 @@ function telemetryRows(t: ChainTelemetry) {
           <FullnessBar permille={fullness} />
         </>
       ) : (
-        DASH
+        <>
+          {DASH}
+          <FullnessBar permille={0} />
+        </>
       ),
     },
   ];
@@ -196,11 +198,14 @@ export function EcosystemSection() {
           <p className="font-manrope text-white/50 text-[11px] leading-[16px] tracking-[0.06em]">RECENT BLOCKS · LATEST {RECENT_BLOCK_COUNT}</p>
           {explorerTag}
         </div>
-        {head === null ? (
-          <p className="font-manrope text-white/45 text-[13px] leading-[19px] py-6">Blocks appear when the RPC responds.</p>
-        ) : (
-          <RecentBlocks rows={recent} focused={focused} selected={selected} onFocusBlock={setFocused} onSelectBlock={setSelected} />
-        )}
+        {/* Reserve the list's height while loading so content below never jumps (deep links, CLS). */}
+        <div className="min-h-[392px]">
+          {head === null ? (
+            <p className="font-manrope text-white/45 text-[13px] leading-[19px] py-6">Blocks appear when the RPC responds.</p>
+          ) : (
+            <RecentBlocks rows={recent} focused={focused} selected={selected} onFocusBlock={setFocused} onSelectBlock={setSelected} />
+          )}
+        </div>
         {selected !== null && <BlockDetail number={selected} onClose={() => setSelected(null)} onInspectTx={inspectTx} />}
       </Frame>
 

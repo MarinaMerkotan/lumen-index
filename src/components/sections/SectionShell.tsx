@@ -58,7 +58,7 @@ export function SectionShell({ id, number, label, title, intro, tags, children, 
           <span className="reveal-line block h-px bg-white/20 mt-5" aria-hidden="true" />
           <h2
             id={headingId}
-            className="reveal font-graphik text-white font-normal text-[34px] sm:text-[42px] md:text-[52px] leading-[1.04] mt-8 max-w-[520px]"
+            className="reveal font-display text-white font-normal text-[34px] sm:text-[42px] md:text-[52px] leading-[1.04] mt-8 max-w-[520px]"
             style={{ '--i': 1 } as CSSProperties}
           >
             {title}
