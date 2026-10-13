@@ -24,7 +24,7 @@ export function SiteFooter() {
             custodian, exchange or investment service. Nothing here is financial advice.
           </p>
           <p>
-            Ethereum Mainnet is read-only here: no transactions, approvals, swaps or message signing, and no wallet request you did not start.
+            Ethereum Mainnet is read-only here: no transactions, approvals or swaps, and no wallet request you did not start. The only signature is the opt-in Signature Lab message, which authorizes nothing and is verified locally.
             Seed phrases and private keys are never requested. Liquidity Pools and Governance are local demos, not on-chain activity.
           </p>
           <p>

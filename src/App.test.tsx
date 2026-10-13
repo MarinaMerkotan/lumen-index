@@ -35,6 +35,14 @@ describe('App acceptance (first paint)', () => {
     }
   });
 
+  it('labels the local labs as demos and offers no signature before a wallet connects', () => {
+    expect(html).toMatch(/DEMO<span[^>]*>— NO FUNDS/);
+    expect(html).toMatch(/DEMO<span[^>]*>— NOT ON-CHAIN/);
+    expect(html).toContain('NOT A COMMUNITY TALLY');
+    expect(html).toContain('EXPERIMENTAL');
+    expect(html).not.toContain('SIGN MESSAGE');
+  });
+
   it('discloses the RPC provider', () => {
     expect(html).toContain('ethereum-rpc.publicnode.com');
   });
