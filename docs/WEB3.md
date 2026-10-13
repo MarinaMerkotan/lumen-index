@@ -4,6 +4,8 @@
 
 > **M3A explorer:** RPC methods `eth_chainId`, `eth_getBlockByNumber` (headers + tx hashes only), `eth_feeHistory`, `eth_maxPriorityFeePerGas`, `eth_getBalance`, `eth_call` (Multicall3 `0xcA11bde05977b3631167028862bE2a173976CA11`), `eth_getTransactionByHash`, `eth_getTransactionReceipt`. ERC-20 allowlist: USDC `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` (6), DAI `0x6B175474E89094C44Da98b954EedeAC495271d0F` (18), WETH `0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2` (18). No `eth_getLogs`, no indexer.
 
+> **M3B signature lab:** the only wallet signing in the app is one consent-gated `personal_sign` (wagmi `useSignMessage`, `src/features/signature-lab/useSignatureLab.ts`) of a readable demo message, verified locally with viem `recoverMessageAddress`. No typed data, permits, transactions or ERC-1271 checks; `src/security.test.ts` enforces that this file is the only signer.
+
 ## Constraints and implementation selection
 - Current runtime: Vite + React client-only. Keep it that way.
 - Preferred integrations (introduce in milestone 2 after checking version compatibility): `wagmi`, `viem`, `@tanstack/react-query`. Use wallet connectors supported by selected wagmi version; MetaMask/injected wallet is sufficient for the MVP. Add WalletConnect only if needed and after agreeing to its public project ID and provider/privacy impact.

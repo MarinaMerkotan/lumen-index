@@ -47,12 +47,14 @@ Each milestone is intended for **one bounded agent task / PR**. Do not skip ahea
 ## M3B — Simulations, cryptography experiment, polish
 **Goal:** make remaining screens interactive with safe, truthful experiences.
 
-- [ ] Liquidity: deterministic local constant-product AMM example, editable inputs, non-misleading outputs, edge-case tests and prominent `DEMO — NO FUNDS` label.
-- [ ] Governance: in-memory single-user demo vote (reset on reload) with visible `DEMO` / `NOT ON-CHAIN` labels; never label local percentages as community votes.
-- [ ] Optional consent-driven, **message-only** signature demo with readable challenge and local verification; no storage or auth claims.
-- [ ] Connect live-block / wallet transitions to microanimations while honoring reduced motion and performance.
+- [x] Liquidity: deterministic local constant-product AMM example, editable inputs, non-misleading outputs, edge-case tests and prominent `DEMO — NO FUNDS` label.
+- [x] Governance: in-memory single-user demo vote (reset on reload) with visible `DEMO` / `NOT ON-CHAIN` labels; never label local percentages as community votes.
+- [x] Optional consent-driven, **message-only** signature demo with readable challenge and local verification; no storage or auth claims.
+- [x] Connect live-block / wallet transitions to microanimations while honoring reduced motion and performance.
 - [ ] Video fallback, image/poster rights, font licensing, metadata, favicon, mobile, keyboard accessibility and cross-browser checks.
 - [ ] README updates only for actually shipped functionality; Vercel static deploy smoke test with rollback notes.
+
+> **Status (M3B labs):** AMM simulator, local poll and signature lab shipped on `feat/m3b-interactive-labs`. Still open: media/font licensing decisions, favicon/metadata, cross-browser and real-wallet QA, and the static deploy smoke test.
 
 **Acceptance:** interactive demo sections correctly distinguish simulation/live; no financial transactions or storage; touch/mobile/responsive, reduced motion, keyboard, errors and build are checked.
 
