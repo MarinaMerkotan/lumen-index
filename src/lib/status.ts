@@ -4,6 +4,8 @@
  */
 export type DataState =
   | 'live'
+  | 'stale'
+  | 'wallet'
   | 'demo'
   | 'disconnected'
   | 'unavailable'
@@ -14,6 +16,8 @@ export type DataState =
 
 export const DATA_STATE_LABEL: Record<DataState, string> = {
   live: 'LIVE',
+  stale: 'STALE',
+  wallet: 'WALLET',
   demo: 'DEMO',
   disconnected: 'NOT CONNECTED',
   unavailable: 'UNAVAILABLE',
@@ -24,7 +28,9 @@ export const DATA_STATE_LABEL: Record<DataState, string> = {
 };
 
 export const DATA_STATE_MEANING: Record<DataState, string> = {
-  live: 'Read from a public chain at the time shown.',
+  live: 'Read from Ethereum Mainnet via a public RPC at the time shown.',
+  stale: 'Last successful read is older than expected. Not presented as current.',
+  wallet: 'Reported by the wallet you connected.',
   demo: 'Computed locally in your browser. No funds, nothing on-chain.',
   disconnected: 'Requires a wallet connection you start yourself.',
   unavailable: 'No data source is wired up, or the source failed.',

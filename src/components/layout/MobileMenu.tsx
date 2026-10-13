@@ -113,7 +113,7 @@ export function MobileMenu({ open, activeId, onClose }: MobileMenuProps) {
           className={`mt-auto pt-10 border-t border-white/10 transition-[opacity,transform] duration-500 ${EASE} ${open ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           style={{ transitionDelay: open ? '450ms' : '0ms' }}
         >
-          {open && <WalletControl variant="stacked" />}
+          {open && <WalletControl variant="stacked" block />}
         </div>
       </div>
     </div>

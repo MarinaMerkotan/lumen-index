@@ -1,4 +1,7 @@
 import { MotionProvider } from './components/ambient/MotionContext';
+import { Web3Provider } from './components/providers/Web3Provider';
+import { BlockPulseEmitter } from './features/ecosystem/BlockPulseEmitter';
+import { WalletProvider } from './features/wallet/WalletContext';
 import { Hero } from './components/hero/Hero';
 import { SiteFooter } from './components/layout/SiteFooter';
 import { SiteHeader } from './components/layout/SiteHeader';
@@ -11,10 +14,23 @@ import { LiquiditySection } from './features/liquidity/LiquiditySection';
 import { useActiveSection } from './hooks/useActiveSection';
 
 export default function App() {
+  return (
+    <Web3Provider>
+      <WalletProvider>
+        <MotionProvider>
+          <BlockPulseEmitter />
+          <Page />
+        </MotionProvider>
+      </WalletProvider>
+    </Web3Provider>
+  );
+}
+
+function Page() {
   const activeId = useActiveSection(SECTION_IDS);
 
   return (
-    <MotionProvider>
+    <>
       <a href="#main" className="skip-link font-manrope">
         Skip to content
       </a>
@@ -28,6 +44,6 @@ export default function App() {
         <GovernanceSection />
         <SiteFooter />
       </main>
-    </MotionProvider>
+    </>
   );
 }

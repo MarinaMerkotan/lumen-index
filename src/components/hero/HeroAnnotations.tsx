@@ -1,6 +1,11 @@
 import { CSSProperties, useState } from 'react';
 import { ambientTiming } from '../../lib/ambient';
+import { formatBlockNumber, truncateAddress } from '../../lib/format/eth';
+import { useChainTelemetry } from '../../features/ecosystem/useChainTelemetry';
+import { useWalletState } from '../../features/wallet/useWalletState';
 import { NodeSquare } from '../ambient/NodeSquare';
+
+type LiveState = 'idle' | 'linked' | 'offline';
 
 type Segment = readonly [x1: number, y1: number, x2: number, y2: number];
 
@@ -71,6 +76,26 @@ const pct = (value: number) => `${value}%`;
  */
 export function HeroAnnotations() {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const telemetry = useChainTelemetry();
+  const { view } = useWalletState();
+
+  const liveState: Record<string, LiveState> = {
+    telemetry: telemetry.state === 'error' ? 'offline' : 'idle',
+    connectivity: view.status === 'connected' ? 'linked' : 'idle',
+    simulation: 'idle',
+  };
+
+  /** Live readout pinned under the telemetry square: real block height or an honest RPC state. */
+  const telemetryReadout = telemetry.block
+    ? `${telemetry.state === 'stale' ? 'STALE' : 'LIVE'} · #${formatBlockNumber(telemetry.block.number)}`
+    : telemetry.state === 'error'
+      ? 'RPC UNAVAILABLE'
+      : 'CONNECTING TO RPC…';
+
+  /** Short live line under an annotation; only shown for a real wallet connection. */
+  const liveLine: Record<string, string | null> = {
+    connectivity: view.status === 'connected' ? `WALLET LINKED · ${truncateAddress(view.address)}` : null,
+  };
 
   return (
     <div className="hero-annotations absolute inset-0 pointer-events-none">
@@ -83,7 +108,7 @@ export function HeroAnnotations() {
                 '--delay': `${2600 + n * 2900 + s * SIGNAL_CYCLE_MS * SIGNAL_TRAVEL}ms`,
               } as CSSProperties;
               return (
-                <g key={`${node.id}-${s}`} className="connector" data-active={activeId === node.id}>
+                <g key={`${node.id}-${s}`} className="connector" data-active={activeId === node.id} data-node={node.id} data-live={liveState[node.id]}>
                   <line
                     className="connector__base anim-draw-line"
                     style={{ animationDelay: `${node.lineDelays[s]}ms` }}
@@ -94,6 +119,15 @@ export function HeroAnnotations() {
                     pathLength={100}
                   />
                   <line className="connector__signal" style={signalStyle} x1={pct(x1)} y1={pct(y1)} x2={pct(x2)} y2={pct(y2)} pathLength={100} />
+                  <line
+                    className="connector__burst"
+                    style={{ '--burst-delay': `${s * 520}ms` } as CSSProperties}
+                    x1={pct(x1)}
+                    y1={pct(y1)}
+                    x2={pct(x2)}
+                    y2={pct(y2)}
+                    pathLength={100}
+                  />
                 </g>
               );
             }),
@@ -108,8 +142,18 @@ export function HeroAnnotations() {
             enterDelay={node.square.delay}
             trace={ambientTiming(n, { minDuration: 7000, maxDuration: 11000, baseDelay: 3000, maxDelay: 5000 }, 3)}
             active={activeId === node.id}
+            nodeId={node.id}
+            liveState={liveState[node.id]}
           />
         ))}
+
+        <span
+          className="hero-live-line absolute font-manrope text-[11px] leading-[14px] tracking-[0.06em] tabular-nums whitespace-nowrap anim-fade-in"
+          data-live={liveState.telemetry}
+          style={{ top: `calc(${NODES[0].square.top} + 112px)`, left: NODES[0].square.left, animationDelay: '2300ms' }}
+        >
+          {telemetryReadout}
+        </span>
       </div>
 
       <ul className="absolute inset-0 parallax-near">
@@ -131,11 +175,19 @@ export function HeroAnnotations() {
                 [ {node.title} ]
               </span>
               <span
-                className="block font-manrope text-white/50 text-[11px] leading-[14px] mt-[4px] transition-colors duration-300 group-hover:text-white/75 group-focus-visible:text-white/75"
+                className="block font-manrope text-white/55 text-[12px] leading-[16px] mt-[4px] transition-colors duration-300 group-hover:text-white/75 group-focus-visible:text-white/75"
                 style={{ maxWidth: `min(${node.label.maxWidth}px, 20vw)` }}
               >
                 {node.description}
               </span>
+              {liveLine[node.id] && (
+                <span
+                  className="hero-live-line block font-manrope text-[11px] leading-[14px] tracking-[0.04em] mt-[6px] tabular-nums"
+                  data-live={liveState[node.id]}
+                >
+                  {liveLine[node.id]}
+                </span>
+              )}
             </a>
           </li>
         ))}

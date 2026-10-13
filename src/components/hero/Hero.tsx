@@ -3,6 +3,7 @@ import { useMotion } from '../ambient/MotionContext';
 import { useAmbient } from '../ambient/useAmbient';
 import { GridField } from '../ambient/GridField';
 import { usePointerField } from '../../hooks/usePointerField';
+import { usePulse } from '../../hooks/usePulse';
 import { HeroAnnotations } from './HeroAnnotations';
 import { HeroFooter } from './HeroFooter';
 import { HeroMedia } from './HeroMedia';
@@ -12,6 +13,10 @@ export function Hero() {
   const { motionEnabled } = useMotion();
   const ambientLive = useAmbient(ref);
   usePointerField(ref, motionEnabled);
+  // Live-data choreography: a new block ripples the grid and fires the telemetry path;
+  // a wallet connection lights the connectivity path. CSS-only, skipped when motion is off.
+  usePulse(ref, 'block', 'pulse-block', 2000);
+  usePulse(ref, 'wallet-connected', 'pulse-wallet', 2000);
 
   return (
     <section

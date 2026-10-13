@@ -1,7 +1,9 @@
 import { DATA_STATE_MEANING, DataState } from '../../lib/status';
+import { MAINNET_RPC_URL } from '../../lib/web3/config';
+import { rpcHost } from '../../lib/web3/rpc';
 import { StatusTag } from '../ui/StatusTag';
 
-const LEGEND: DataState[] = ['live', 'demo', 'disconnected', 'unavailable', 'loading', 'next'];
+const LEGEND: DataState[] = ['live', 'stale', 'wallet', 'loading', 'error', 'disconnected', 'unavailable', 'demo'];
 
 /** Honest boundaries and third-party data flows (docs/SECURITY.md), plus the status label legend. */
 export function SiteFooter() {
@@ -22,13 +24,13 @@ export function SiteFooter() {
             custodian, exchange or investment service. Nothing here is financial advice.
           </p>
           <p>
-            Mainnet features will be read-only: no transactions, approvals, swaps or signature prompts you did not start. Seed phrases and private keys
-            are never requested.
+            Ethereum Mainnet is read-only here: no transactions, approvals, swaps or message signing, and no wallet request you did not start.
+            Seed phrases and private keys are never requested. Liquidity Pools and Governance are local demos, not on-chain activity.
           </p>
           <p>
-            Third-party requests: the hero video is served from an external CDN and fonts from Google Fonts and onlinewebfonts.com. When chain
-            features ship, a public RPC provider and your wallet extension will see standard request metadata such as IP address and, after you
-            connect, your public address.
+            Third-party requests: chain data is read from the public RPC at {rpcHost(MAINNET_RPC_URL)}, which sees your IP address and the
+            queries made, including your public address once you connect. Your wallet extension sees this site&rsquo;s requests. The hero video is
+            served from an external CDN and fonts from Google Fonts and onlinewebfonts.com.
           </p>
         </div>
 

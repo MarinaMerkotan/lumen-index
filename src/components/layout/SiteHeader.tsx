@@ -52,7 +52,7 @@ export function SiteHeader({ activeId }: { activeId: string | null }) {
           </ul>
         </div>
 
-        <div className="hidden xl:flex items-center ml-auto anim-slide-right" style={{ animationDelay: '600ms' }}>
+        <div className="hidden xl:flex items-center ml-auto -my-[7px] anim-slide-right" style={{ animationDelay: '600ms' }}>
           <WalletControl variant="header" />
         </div>
 

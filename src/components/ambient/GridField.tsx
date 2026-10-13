@@ -62,6 +62,7 @@ export function GridField() {
               top={top}
               left={left}
               enterDelay={1000 + index * 80}
+              rippleIndex={vi + hi}
               pulse={ambientTiming(index, { minDuration: 6500, maxDuration: 12500, baseDelay: 2200, maxDelay: 7000 })}
             />
           );

@@ -2,6 +2,8 @@ import { DATA_STATE_LABEL, DataState } from '../../lib/status';
 
 const TONE: Record<DataState, string> = {
   live: 'border-ice/60 text-ice',
+  stale: 'border-dashed border-white/35 text-white/70',
+  wallet: 'border-ice/40 text-ice/90',
   demo: 'border-ice/50 text-ice',
   disconnected: 'border-white/25 text-white/70',
   unavailable: 'border-white/15 text-white/45',

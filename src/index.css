@@ -221,6 +221,85 @@ html[data-motion="off"] .grid-lens { opacity: 0; }
 .poll-track { transition: border-color 0.4s var(--ease-out); }
 .poll-option:hover .poll-track { border-color: rgb(var(--ice) / 0.4); }
 
+/* ---------- Live-data pulses (M2): one-shot, triggered by real block / wallet events ---------- */
+.connector__burst {
+  stroke: rgb(var(--ice)); stroke-width: 2; stroke-linecap: round;
+  stroke-dasharray: 14 300; stroke-dashoffset: 14; opacity: 0;
+  filter: drop-shadow(0 0 4px rgb(var(--ice)));
+}
+@keyframes connectorBurst { 0% { stroke-dashoffset: 14; opacity: 0; } 8%, 90% { opacity: 1; } 100% { stroke-dashoffset: -100; opacity: 0; } }
+.pulse-block .connector[data-node="telemetry"] .connector__burst,
+.pulse-wallet .connector[data-node="connectivity"] .connector__burst { animation: connectorBurst 620ms ease-in var(--burst-delay, 0ms) 1 both; }
+
+.node-square__flash {
+  position: absolute; inset: 0; opacity: 0; border: 1px solid rgb(var(--ice));
+  background: radial-gradient(circle, rgb(var(--ice) / 0.22), transparent 70%);
+}
+@keyframes nodeFlash { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
+.pulse-block .node-square[data-node="telemetry"] .node-square__flash,
+.pulse-wallet .node-square[data-node="connectivity"] .node-square__flash { animation: nodeFlash 1100ms ease-out 1000ms 1 both; }
+
+/* Persistent live states settle in and out slowly (wallet linked, RPC offline). */
+.node-square__frame { transition: border-color 1.2s var(--ease-out); }
+.node-square[data-live="linked"] .node-square__frame { border-color: rgb(var(--ice) / 0.85); }
+.node-square[data-live="offline"] .node-square__frame { border-style: dashed; border-color: rgb(255 255 255 / 0.4); }
+.connector[data-live="linked"] .connector__base { stroke: rgb(var(--ice) / 0.45); }
+.connector[data-live="offline"] .connector__signal { animation: none; }
+
+.crosshair-ripple {
+  position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 50%;
+  border: 1px solid rgb(var(--ice) / 0.7); opacity: 0; transform: translate(-50%, -50%) scale(0.2);
+}
+@keyframes crosshairRipple {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  15% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); }
+}
+.pulse-block .crosshair-ripple { animation: crosshairRipple 1100ms ease-out calc(var(--i, 0) * 90ms) 1 both; }
+
+.hero-live-line { color: rgb(var(--ice) / 0.9); transition: color 0.6s var(--ease-out); }
+.hero-live-line[data-live="offline"] { color: #ffb4a8; }
+
+.block-node { transition: border-color 0.8s var(--ease-out); }
+.block-node[data-live="true"] { border-color: rgb(255 255 255 / 0.7); }
+.block-node[data-newest="true"][data-live="true"] { border-color: rgb(var(--ice)); }
+.block-node::before { content: ""; position: absolute; inset: -5px; border: 1px solid rgb(var(--ice)); opacity: 0; }
+@keyframes blockArrive { 0% { opacity: 0; transform: scale(0.7); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(1.35); } }
+.pulse-block .block-node[data-newest="true"]::before { animation: blockArrive 1200ms ease-out 1 both; }
+.pulse-block .block-node[data-newest="true"]::after { animation: blockPing 1200ms ease-out 1 both; }
+
+.wallet-panel { position: relative; }
+.wallet-panel::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: rgb(var(--ice) / 0.07);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 30px 100%, 0 calc(100% - 30px));
+}
+@keyframes panelGlow { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
+.pulse-wallet.wallet-panel::after { animation: panelGlow 1600ms ease-out 1 both; }
+
+/* No ambient "activity" in the block schematic unless telemetry is actually live. */
+.telemetry-panel:not([data-telemetry="live"]) .schematic-signal,
+.telemetry-panel:not([data-telemetry="live"]) .block-node::after { animation: none; opacity: 0; }
+
+/* ---------- Primary wallet CTA ---------- */
+.wallet-cta {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 2px;
+  background: rgb(var(--ice)); color: #000; white-space: nowrap;
+  font-family: 'Manrope', 'Helvetica Neue', Arial, sans-serif; font-weight: 500; font-size: 13px; line-height: 16px; letter-spacing: 0.06em;
+  transition: background-color 0.25s var(--ease-out), box-shadow 0.4s var(--ease-out), transform 0.15s var(--ease-out);
+}
+.wallet-cta:hover { background: #c8e8ff; box-shadow: 0 0 26px rgb(var(--ice) / 0.28); }
+.wallet-cta:active { background: #9fd2f7; transform: translateY(1px); box-shadow: none; }
+.wallet-cta:focus-visible { outline: 1px solid rgb(var(--ice)); outline-offset: 3px; }
+.wallet-cta:disabled { cursor: not-allowed; background: rgb(var(--ice) / 0.45); box-shadow: none; transform: none; }
+.wallet-cta[aria-busy="true"] { cursor: progress; background: rgb(var(--ice) / 0.7); }
+.wallet-cta--tall { padding-top: 14px; padding-bottom: 14px; } /* 44px touch target */
+.wallet-cta__arrow { transition: transform 0.4s var(--ease-out); }
+.wallet-cta:hover .wallet-cta__arrow { transform: translateX(3px); }
+
+.wallet-popover { animation: popoverIn 0.35s var(--ease-out) both; }
+@keyframes popoverIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
 /* ---------- Reduced motion: no continuous motion, entrances resolve instantly ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
