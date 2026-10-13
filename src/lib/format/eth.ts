@@ -1,4 +1,4 @@
-import { formatEther, formatGwei, getAddress, isAddress } from 'viem';
+import { formatEther, formatGwei, formatUnits, getAddress, isAddress } from 'viem';
 
 const GROUP = /\B(?=(\d{3})+(?!\d))/g;
 
@@ -24,6 +24,24 @@ export function formatEthAmount(wei: bigint, maxDecimals = 6): string {
   const { text, truncatedToZero } = truncateDecimal(formatEther(wei), maxDecimals);
   if (truncatedToZero) return `< 0.${'0'.repeat(maxDecimals - 1)}1`;
   return text;
+}
+
+/**
+ * Formats a raw ERC-20 amount with the token's on-chain decimals (bigint-safe, truncating).
+ * Explicit zero renders as `0`; positive dust below the precision renders as `< 0.0…1`.
+ */
+export function formatTokenAmount(raw: bigint, decimals: number, maxDecimals = 6): string {
+  if (raw < 0n) throw new RangeError('Negative amounts are not valid');
+  if (!Number.isInteger(decimals) || decimals < 0 || decimals > 255) throw new RangeError('Invalid token decimals');
+  const places = Math.min(maxDecimals, decimals);
+  const { text, truncatedToZero } = truncateDecimal(formatUnits(raw, decimals), places);
+  if (truncatedToZero) return `< 0.${'0'.repeat(Math.max(places - 1, 0))}1`;
+  return text;
+}
+
+/** Gas quantities (not prices) with thousands separators, e.g. `14,923,201`. */
+export function formatGas(gas: bigint): string {
+  return groupDigits(gas.toString());
 }
 
 /** Formats a fee-per-gas value (wei) in gwei: 3 decimals below 1 gwei, otherwise 2. */

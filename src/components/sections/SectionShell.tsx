@@ -14,6 +14,8 @@ interface SectionShellProps {
   intro: ReactNode;
   tags: ReactNode;
   children: ReactNode;
+  /** Optional full-width area below the heading/content grid (explorers, charts). */
+  wide?: ReactNode;
   /** Seed so each section's boundary pulses keep their own rhythm. */
   seed: number;
 }
@@ -22,7 +24,7 @@ interface SectionShellProps {
  * Shared section layout: label rule, editorial heading, truth tags, and a content column.
  * Grid crosshairs sit where the section boundary crosses the page-wide vertical hairlines.
  */
-export function SectionShell({ id, number, label, title, intro, tags, children, seed }: SectionShellProps) {
+export function SectionShell({ id, number, label, title, intro, tags, children, wide, seed }: SectionShellProps) {
   const ref = useRef<HTMLElement>(null);
   const revealed = useInView(ref, { rootMargin: '0px 0px -15% 0px', once: true });
   const ambientLive = useAmbient(ref);
@@ -76,6 +78,12 @@ export function SectionShell({ id, number, label, title, intro, tags, children, 
           {children}
         </div>
       </div>
+
+      {wide && (
+        <div className="reveal relative mt-14 lg:mt-20" style={{ '--i': 3 } as CSSProperties}>
+          {wide}
+        </div>
+      )}
     </section>
   );
 }

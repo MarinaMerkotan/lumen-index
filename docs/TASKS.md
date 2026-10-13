@@ -31,7 +31,20 @@ Each milestone is intended for **one bounded agent task / PR**. Do not skip ahea
 
 **Acceptance:** disconnected view still shows public live block data if RPC works; account is never hardcoded; live values have source/chain states; error behavior honest; no mainnet write path exists; build passes.
 
-## M3 — Simulations, cryptography experiment, polish
+## M3A — Blockchain & asset explorer (approved roadmap extension)
+**Goal:** turn the read-only Ecosystem and Lumen Index sections into interactive exploration tools, still strictly read-only and frontend-only.
+
+- [ ] Recent blocks (8–12) from the public RPC with bounded, cached reads; selectable block detail (hash, time, tx count, gas used/limit, base fee, Etherscan link); loading/live/stale/error states.
+- [ ] Base-fee history chart (SVG) from `eth_feeHistory`: observed values vs. the protocol-computed next-block base fee clearly separated; hover/focus tooltips; no interpolated or invented points.
+- [ ] Transaction lookup by strictly validated hash: status (success/reverted/pending/not found), from/to, value, gas used, effective gas price, block and confirmations, Etherscan link; decode standard ERC-20 `Transfer`/`Approval` logs with the verified ABI, show raw metadata for anything else. No submission, no signing, no `eth_getLogs` scans.
+- [ ] Asset explorer with two explicit modes: connected wallet vs. any public address (validated with viem, never stored). ETH plus allowlisted ERC-20 balances (USDC, DAI, WETH; verified Mainnet addresses and decimals) via one Multicall3 `eth_call`; no USD values.
+- [ ] Network transparency: assets are always read from Ethereum Mainnet; a wallet on another chain is shown as such with an optional user-initiated switch.
+- [ ] Motion: block arrivals, block selection, chart focus and successful lookups drive restrained CSS/SVG signals through the existing pulse architecture; reduced motion and Pause Motion respected.
+- [ ] Tests for validation, formatting, block/fee transforms, receipt status, log decoding, token reads and the read-only guard; real Mainnet browser QA.
+
+**Acceptance:** a visitor can explore real blocks, read recent fees, inspect a transaction and view ETH/ERC-20 balances for any public address without connecting a wallet, signing or sending anything; RPC usage stays bounded and every figure is real or explicitly unavailable.
+
+## M3B — Simulations, cryptography experiment, polish
 **Goal:** make remaining screens interactive with safe, truthful experiences.
 
 - [ ] Liquidity: deterministic local constant-product AMM example, editable inputs, non-misleading outputs, edge-case tests and prominent `DEMO — NO FUNDS` label.

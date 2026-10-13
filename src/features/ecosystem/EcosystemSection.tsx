@@ -1,4 +1,4 @@
-import { CSSProperties, useRef } from 'react';
+import { CSSProperties, useRef, useState } from 'react';
 import { RotateCw } from 'lucide-react';
 import { SectionShell } from '../../components/sections/SectionShell';
 import { Frame } from '../../components/ui/Frame';
@@ -14,6 +14,11 @@ import { useNow } from '../../hooks/useNow';
 import { DataState } from '../../lib/status';
 import { BlockSnapshot, ChainTelemetry, useChainTelemetry } from './useChainTelemetry';
 import { TelemetryState, blockFullnessPermille } from './telemetryState';
+import { BaseFeeChart } from './BaseFeeChart';
+import { BlockDetail } from './BlockDetail';
+import { RecentBlocks } from './RecentBlocks';
+import { RECENT_BLOCK_COUNT, useFeeHistory, useRecentBlocks } from './useBlockExplorer';
+import { TransactionExplorer } from '../transactions/TransactionExplorer';
 
 const HEIGHTS = 6;
 const CYCLE_MS = 8000;
@@ -28,7 +33,7 @@ function BlockAge({ timestampMs }: { timestampMs: number }) {
 }
 
 /** Latest block heights as linked squares; the newest one flashes when a block arrives. */
-function BlockHeights({ block }: { block: BlockSnapshot | null }) {
+function BlockHeights({ block, highlight }: { block: BlockSnapshot | null; highlight: bigint | null }) {
   const heights = block ? Array.from({ length: HEIGHTS }, (_, i) => block.number - BigInt(HEIGHTS - 1 - i)) : null;
 
   return (
@@ -54,6 +59,7 @@ function BlockHeights({ block }: { block: BlockSnapshot | null }) {
               className="block-node"
               data-newest={i === HEIGHTS - 1}
               data-live={Boolean(heights)}
+              data-highlight={heights !== null && highlight !== null && heights[i] === highlight}
               style={
                 {
                   left: `calc(${position * 100}% - ${position * 24}px)`,
@@ -159,20 +165,94 @@ export function EcosystemSection() {
   usePulse(pulseRef, 'block', 'pulse-block', 1600);
   const { state, errorKind, lastSuccess } = telemetry;
 
+  // Explorer state lives here so the list, chart, schematic and detail stay linked.
+  const [selected, setSelected] = useState<bigint | null>(null);
+  const [focused, setFocused] = useState<bigint | null>(null);
+  const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const txRef = useRef<HTMLDivElement>(null);
+  // Past blocks are immutable: on RPC failure the explorer keeps the last known head, labelled as such.
+  const head = telemetry.block?.number ?? lastSuccess?.number ?? null;
+  const headIsCurrent = state === 'live';
+  const recent = useRecentBlocks(head);
+  const fees = useFeeHistory(head);
+
+  const inspectTx = (hash: `0x${string}`) => {
+    setTxHash(hash);
+    txRef.current?.scrollIntoView({ block: 'start' });
+  };
+
+  const explorerTag = headIsCurrent ? (
+    <StatusTag state="live" />
+  ) : head !== null ? (
+    <StatusTag state="stale" detail="LAST KNOWN HEAD" />
+  ) : (
+    <StatusTag state={STATE_TAG[state]} />
+  );
+
+  const wide = (
+    <div className="grid gap-6 lg:grid-cols-12">
+      <Frame className="p-6 md:p-8 lg:col-span-7">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <p className="font-manrope text-white/50 text-[11px] leading-[16px] tracking-[0.06em]">RECENT BLOCKS · LATEST {RECENT_BLOCK_COUNT}</p>
+          {explorerTag}
+        </div>
+        {head === null ? (
+          <p className="font-manrope text-white/45 text-[13px] leading-[19px] py-6">Blocks appear when the RPC responds.</p>
+        ) : (
+          <RecentBlocks rows={recent} focused={focused} selected={selected} onFocusBlock={setFocused} onSelectBlock={setSelected} />
+        )}
+        {selected !== null && <BlockDetail number={selected} onClose={() => setSelected(null)} onInspectTx={inspectTx} />}
+      </Frame>
+
+      <Frame className="p-6 md:p-8 lg:col-span-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <p className="font-manrope text-white/50 text-[11px] leading-[16px] tracking-[0.06em]">BASE FEE HISTORY · 20 BLOCKS</p>
+          {fees.isError && !fees.data ? <StatusTag state="error" /> : explorerTag}
+        </div>
+        <BaseFeeChart
+          points={fees.data ?? null}
+          stale={!headIsCurrent || fees.isPlaceholderData}
+          focused={focused}
+          selected={selected}
+          onFocusBlock={setFocused}
+          onSelectBlock={setSelected}
+        />
+        {fees.isError && (
+          <button type="button" className="mt-3 font-manrope text-[13px] text-ice hover:underline underline-offset-4" onClick={() => void fees.refetch()}>
+            RETRY FEE HISTORY
+          </button>
+        )}
+      </Frame>
+
+      <div ref={txRef} className="lg:col-span-12 scroll-mt-24">
+        <Frame className="p-6 md:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <p className="font-manrope text-white/50 text-[11px] leading-[16px] tracking-[0.06em]">TRANSACTION LOOKUP · ETHEREUM MAINNET</p>
+            <span className="inline-flex items-center border border-white/15 rounded-[2px] px-[6px] py-[2px] font-manrope text-[11px] leading-[14px] tracking-[0.04em] text-white/60">
+              READ-ONLY
+            </span>
+          </div>
+          <TransactionExplorer hash={txHash} latest={telemetry.block?.number ?? null} onLookup={setTxHash} />
+        </Frame>
+      </div>
+    </div>
+  );
+
   return (
     <SectionShell
       id="ecosystem"
       number="01"
       label="ECOSYSTEM"
       seed={11}
+      wide={wide}
       title="Public chain telemetry, read-only."
       intro={
         <>
           <p>
-            Live reads from Ethereum Mainnet through a public RPC endpoint: the chain ID, the latest block, its base fee and how full it is. No
-            wallet is needed and nothing is ever written to the chain.
+            Live reads from Ethereum Mainnet through a public RPC endpoint: the latest blocks, their base fees and how full they are, plus a
+            read-only lookup for any transaction hash. No wallet is needed and nothing is ever written to the chain.
           </p>
-          <p>Polling follows the ~12 s block time, pauses while this tab is hidden and slows down if the endpoint pushes back.</p>
+          <p>Select a block or a bar in the fee chart to inspect it. Polling follows the ~12 s block time and pauses while this tab is hidden.</p>
         </>
       }
       tags={
@@ -223,7 +303,7 @@ export function EcosystemSection() {
             )}
           </div>
 
-          <BlockHeights block={telemetry.block} />
+          <BlockHeights block={telemetry.block} highlight={focused ?? selected} />
         </Frame>
       </div>
     </SectionShell>

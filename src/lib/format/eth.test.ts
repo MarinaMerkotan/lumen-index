@@ -1,6 +1,6 @@
-import { parseEther, parseGwei } from 'viem';
+import { parseEther, parseGwei, parseUnits } from 'viem';
 import { describe, expect, it } from 'vitest';
-import { formatAge, formatBlockNumber, formatEthAmount, formatGasGwei, toChecksumAddress, truncateAddress } from './eth';
+import { formatAge, formatBlockNumber, formatEthAmount, formatGas, formatGasGwei, formatTokenAmount, toChecksumAddress, truncateAddress } from './eth';
 
 describe('formatEthAmount', () => {
   it('formats whole and fractional ETH from wei without floats', () => {
@@ -64,5 +64,33 @@ describe('misc formatting', () => {
     expect(formatAge(0, 8_000)).toBe('8 s ago');
     expect(formatAge(0, 125_000)).toBe('2 min ago');
     expect(formatAge(10_000, 0)).toBe('0 s ago');
+  });
+});
+
+describe('formatTokenAmount', () => {
+  it('uses the token decimals with bigint precision', () => {
+    expect(formatTokenAmount(parseUnits('1234.56789', 6), 6)).toBe('1,234.56789');
+    expect(formatTokenAmount(parseUnits('0.5', 18), 18)).toBe('0.5');
+    expect(formatTokenAmount(10n ** 40n, 18)).toBe('10,000,000,000,000,000,000,000');
+  });
+
+  it('keeps zero explicit and flags dust', () => {
+    expect(formatTokenAmount(0n, 6)).toBe('0');
+    expect(formatTokenAmount(1n, 18)).toBe('< 0.000001');
+    expect(formatTokenAmount(1n, 6)).toBe('0.000001');
+  });
+
+  it('supports whole-unit display and zero-decimal tokens', () => {
+    expect(formatTokenAmount(parseUnits('42.9', 6), 6, 0)).toBe('42');
+    expect(formatTokenAmount(7n, 0)).toBe('7');
+  });
+
+  it('rejects invalid input', () => {
+    expect(() => formatTokenAmount(-1n, 6)).toThrow(RangeError);
+    expect(() => formatTokenAmount(1n, 1.5)).toThrow(RangeError);
+  });
+
+  it('groups gas quantities', () => {
+    expect(formatGas(14923201n)).toBe('14,923,201');
   });
 });

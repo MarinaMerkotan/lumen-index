@@ -5,6 +5,15 @@ import type { ChainTelemetry } from './useChainTelemetry';
 
 const telemetry = vi.hoisted(() => ({ current: null as unknown as ChainTelemetry }));
 vi.mock('./useChainTelemetry', () => ({ useChainTelemetry: () => telemetry.current }));
+vi.mock('./useBlockExplorer', () => ({
+  RECENT_BLOCK_COUNT: 10,
+  useRecentBlocks: () => [],
+  useFeeHistory: () => ({ data: undefined, isError: false, isPlaceholderData: false, refetch: () => undefined }),
+  useBlockSummary: () => ({ status: 'pending', data: undefined, refetch: () => undefined }),
+}));
+vi.mock('../transactions/useTransactionLookup', () => ({
+  useTransactionLookup: () => ({ status: 'idle', tx: null, receipt: null, errorKind: null, isFetching: false, retry: () => undefined }),
+}));
 
 const { EcosystemSection } = await import('./EcosystemSection');
 

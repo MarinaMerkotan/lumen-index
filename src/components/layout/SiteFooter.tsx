@@ -29,7 +29,7 @@ export function SiteFooter() {
           </p>
           <p>
             Third-party requests: chain data is read from the public RPC at {rpcHost(MAINNET_RPC_URL)}, which sees your IP address and the
-            queries made, including your public address once you connect. Your wallet extension sees this site&rsquo;s requests. The hero video is
+            queries made, including your public address once you connect and any address or transaction hash you inspect. Your wallet extension sees this site&rsquo;s requests. The hero video is
             served from an external CDN and fonts from Google Fonts and onlinewebfonts.com.
           </p>
         </div>

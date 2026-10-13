@@ -3,7 +3,7 @@
  * state through React. Subscribers toggle CSS classes on refs, so a new block never re-renders
  * the decorative tree. Nothing is stored; events are fire-and-forget.
  */
-export type PulseKind = 'block' | 'wallet-connected' | 'wallet-disconnected';
+export type PulseKind = 'block' | 'wallet-connected' | 'wallet-disconnected' | 'tx-found';
 
 const target = new EventTarget();
 
