@@ -14,6 +14,10 @@ const FORBIDDEN: Array<[RegExp, string]> = [
   [/\b(localStorage|sessionStorage|indexedDB|document\.cookie)\b/, 'persistent browser storage'],
   [/walletConnect|WalletConnect/, 'WalletConnect connector'],
   [/dangerouslySetInnerHTML/, 'raw HTML injection'],
+  [/\b(getLogs|useContractEvents|useWatchContractEvent|watchContractEvent|eth_getLogs|createEventFilter)\b/, 'log scan or event filter'],
+  [/includeTransactions:\s*true/, 'full-block transaction retrieval'],
+  [/functionName:\s*['"](approve|transfer|transferFrom|permit|increaseAllowance)['"]/, 'token write call'],
+  [/\b(eval|new Function)\s*\(/, 'dynamic code execution'],
 ];
 
 describe('security boundaries', () => {
@@ -28,6 +32,10 @@ describe('security boundaries', () => {
       expect(files.filter(([, source]) => pattern.test(source)).map(([path]) => path)).toEqual([]);
     });
   }
+
+  it('reads ERC-20 data only through view functions', () => {
+    expect(SOURCES['./features/assets/tokenBalances.ts']).toContain("['balanceOf', 'decimals', 'totalSupply']");
+  });
 
   it('configures wagmi without persistent storage and with injected wallets only', () => {
     const config = SOURCES['./lib/web3/config.ts'];

@@ -1,42 +1,26 @@
-import { ReactNode, useRef } from 'react';
-import { ArrowUpRight, Copy, LogOut, RotateCw } from 'lucide-react';
+import { KeyboardEvent, ReactNode, useId, useRef, useState } from 'react';
+import { ArrowUpRight, Copy, LogOut } from 'lucide-react';
 import { SectionShell } from '../../components/sections/SectionShell';
 import { Frame } from '../../components/ui/Frame';
-import { Readout, ReadoutRow } from '../../components/ui/Readout';
+import { Readout } from '../../components/ui/Readout';
 import { StatusTag } from '../../components/ui/StatusTag';
 import { usePulse } from '../../hooks/usePulse';
 import { mainnetAddressUrl } from '../../lib/chains/networks';
-import { formatClockTime, formatEthAmount } from '../../lib/format/eth';
-import { MAINNET_RPC_URL } from '../../lib/web3/config';
-import { RPC_ERROR_MESSAGE, WALLET_ERROR_MESSAGE } from '../../lib/web3/errors';
-import { rpcHost } from '../../lib/web3/rpc';
+import { WALLET_ERROR_MESSAGE } from '../../lib/web3/errors';
 import { DISCONNECT_NOTE, WalletControl } from '../wallet/WalletControl';
 import { useCopyToClipboard } from '../wallet/useCopyToClipboard';
 import { useWalletState } from '../wallet/useWalletState';
-import type { WalletView } from '../wallet/walletView';
-import { MainnetBalance, useMainnetBalance } from './useMainnetBalance';
+import { AssetList } from './AssetList';
+import { ExploreAddressForm } from './ExploreAddressForm';
 
-const DASH = '—';
 const ACTION = 'inline-flex items-center gap-[6px] font-manrope text-[13px] leading-[15.6px] transition-colors';
+const MICRO_LABEL = 'font-manrope text-white/50 text-[11px] leading-[16px] tracking-[0.06em]';
 
-function SectionTags({ view, balance }: { view: WalletView; balance: MainnetBalance }) {
-  switch (view.status) {
-    case 'unavailable':
-      return <StatusTag state="unavailable" detail="NO WALLET DETECTED" />;
-    case 'connecting':
-      return <StatusTag state="loading" detail="AWAITING WALLET" />;
-    case 'connected':
-      return (
-        <>
-          <StatusTag state="wallet" detail={view.networkName.toUpperCase()} />
-          {balance.state === 'live' && <StatusTag state="live" detail="MAINNET BALANCE" />}
-          {balance.state === 'error' && <StatusTag state="error" detail="BALANCE" />}
-        </>
-      );
-    default:
-      return <StatusTag state="disconnected" />;
-  }
-}
+type Mode = 'wallet' | 'explore';
+const MODES: { id: Mode; label: string }[] = [
+  { id: 'wallet', label: 'CONNECTED WALLET' },
+  { id: 'explore', label: 'EXPLORE ADDRESS' },
+];
 
 function AddressValue({ address }: { address: `0x${string}` }) {
   const [copyState, copy] = useCopyToClipboard();
@@ -58,64 +42,74 @@ function AddressValue({ address }: { address: `0x${string}` }) {
   );
 }
 
-function BalanceValue({ balance }: { balance: MainnetBalance }) {
-  if (balance.state === 'live' && balance.wei !== null) {
-    return (
-      <span className="font-graphik text-[22px] leading-[26px] tabular-nums text-white">
-        {formatEthAmount(balance.wei)} <span className="text-white/60 text-[15px]">ETH</span>
-      </span>
-    );
-  }
-  if (balance.state === 'error') {
-    return (
-      <span className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <span>{DASH}</span>
+/** Two explicit modes; the inspected address never takes the place of the connected identity. */
+function ModeTabs({ mode, onChange, panelId }: { mode: Mode; onChange: (mode: Mode) => void; panelId: string }) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    const next = mode === 'wallet' ? 'explore' : 'wallet';
+    onChange(next);
+    listRef.current?.querySelector<HTMLButtonElement>(`[data-mode="${next}"]`)?.focus();
+  };
+  return (
+    <div ref={listRef} role="tablist" aria-label="Asset source" className="mode-tabs flex border-b border-white/10 mb-6" onKeyDown={onKeyDown}>
+      {MODES.map((item) => (
         <button
+          key={item.id}
           type="button"
-          className={`${ACTION} text-ice hover:underline underline-offset-4 disabled:opacity-50`}
-          onClick={balance.retry}
-          disabled={balance.isFetching}
+          role="tab"
+          data-mode={item.id}
+          aria-selected={mode === item.id}
+          aria-controls={panelId}
+          tabIndex={mode === item.id ? 0 : -1}
+          onClick={() => onChange(item.id)}
+          className="mode-tab font-manrope text-[12px] leading-[16px] tracking-[0.06em] px-[2px] pb-[10px] mr-6"
         >
-          <RotateCw className={balance.isFetching ? 'w-[12px] h-[12px] animate-spin' : 'w-[12px] h-[12px]'} strokeWidth={1.5} aria-hidden="true" />
-          RETRY
+          {item.label}
         </button>
-      </span>
-    );
-  }
-  return <StatusTag state="loading" detail="READING MAINNET" />;
-}
-
-function balanceNote(balance: MainnetBalance): string {
-  if (balance.state === 'live' && balance.updatedAt) {
-    return `Native ETH on Ethereum Mainnet, read via ${rpcHost(MAINNET_RPC_URL)} at ${formatClockTime(balance.updatedAt)}. No USD value is shown.`;
-  }
-  if (balance.state === 'error' && balance.errorKind) return RPC_ERROR_MESSAGE[balance.errorKind];
-  return 'Native ETH on Ethereum Mainnet, read via the public RPC.';
-}
-
-function connectedRows(address: `0x${string}`, network: ReactNode, balance: MainnetBalance): ReadoutRow[] {
-  return [
-    { label: 'Address', value: <AddressValue address={address} />, note: 'Shared by your wallet. Public, but linkable to you.' },
-    { label: 'Network', value: network },
-    { label: 'ETH balance', value: <BalanceValue balance={balance} />, note: balanceNote(balance) },
-  ];
+      ))}
+    </div>
+  );
 }
 
 export function LumenIndexSection() {
   const { view, error, isSwitching, switchToMainnet, disconnect } = useWalletState();
-  const balance = useMainnetBalance(view.status === 'connected' ? view.address : undefined);
+  const [mode, setMode] = useState<Mode>('wallet');
+  const [explored, setExplored] = useState<`0x${string}` | null>(null);
+  const panelId = useId();
   const pulseRef = useRef<HTMLDivElement>(null);
   usePulse(pulseRef, 'wallet-connected', 'pulse-wallet', 1800);
 
+  const connected = view.status === 'connected' ? view : null;
   let panel: ReactNode;
-  if (view.status === 'connected') {
+
+  if (mode === 'explore') {
+    panel = (
+      <>
+        <ExploreAddressForm onInspect={setExplored} />
+        {explored && (
+          <div className="mt-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+              <p className={MICRO_LABEL}>INSPECTED ADDRESS · NOT YOUR WALLET</p>
+              {connected && connected.address === explored && <StatusTag state="wallet" detail="SAME AS CONNECTED" />}
+            </div>
+            <Readout rows={[{ label: 'Address', value: <AddressValue address={explored} />, note: 'Public data only. No wallet is involved in this view.' }]} />
+            <div className="mt-6">
+              <AssetList key={explored} address={explored} />
+            </div>
+          </div>
+        )}
+      </>
+    );
+  } else if (connected) {
     const network = (
       <span className="flex flex-col items-start gap-[8px]">
-        <span className={view.onMainnet ? 'text-white' : 'text-[#ffb4a8]'}>
-          {view.networkName}
-          {!view.onMainnet && <span className="text-white/45"> {'·'} not supported</span>}
+        <span className={connected.onMainnet ? 'text-white' : 'text-[#ffb4a8]'}>
+          {connected.networkName}
+          {!connected.onMainnet && <span className="text-white/45"> {'·'} not supported</span>}
         </span>
-        {!view.onMainnet && (
+        {!connected.onMainnet && (
           <>
             <button
               type="button"
@@ -126,7 +120,7 @@ export function LumenIndexSection() {
               {isSwitching ? 'CONFIRM THE SWITCH IN YOUR WALLET' : 'SWITCH TO ETHEREUM MAINNET'}
             </button>
             <span className="font-manrope text-white/45 text-[12px] leading-[17px]">
-              The balance below is read from Ethereum Mainnet, not from {view.networkName}.
+              Assets below are read from Ethereum Mainnet, not from {connected.networkName}.
             </span>
           </>
         )}
@@ -135,14 +129,21 @@ export function LumenIndexSection() {
         )}
       </span>
     );
-
     panel = (
       <>
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-          <p className="font-manrope text-white/50 text-[11px] leading-[16px] tracking-[0.06em]">CONNECTED WALLET</p>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+          <p className={MICRO_LABEL}>CONNECTED WALLET</p>
           <StatusTag state="wallet" />
         </div>
-        <Readout rows={connectedRows(view.address, network, balance)} />
+        <Readout
+          rows={[
+            { label: 'Address', value: <AddressValue address={connected.address} />, note: 'Shared by your wallet. Public, but linkable to you.' },
+            { label: 'Wallet network', value: network },
+          ]}
+        />
+        <div className="mt-6">
+          <AssetList key={connected.address} address={connected.address} />
+        </div>
         <div className="mt-4 pt-5 border-t border-white/[0.08] flex flex-col items-start gap-[8px]">
           <button type="button" className={`${ACTION} text-white/70 hover:text-white`} onClick={disconnect}>
             <LogOut className="w-[13px] h-[13px]" strokeWidth={1.5} aria-hidden="true" />
@@ -155,19 +156,29 @@ export function LumenIndexSection() {
   } else {
     panel = (
       <>
-        <div className="pb-6 mb-2 border-b border-white/[0.08]">
-          <WalletControl variant="stacked" />
-        </div>
-        <Readout
-          rows={[
-            { label: 'Address', value: view.status === 'connecting' ? 'Waiting for your wallet…' : 'Not connected' },
-            { label: 'Network', value: DASH, note: 'Reported by your wallet after you connect.' },
-            { label: 'ETH balance', value: DASH, note: 'Read from Ethereum Mainnet for the connected address.' },
-          ]}
-        />
+        <WalletControl variant="stacked" />
+        <p className="mt-6 pt-5 border-t border-white/[0.08] font-manrope text-white/55 text-[13px] leading-[19px]">
+          {view.status === 'connecting' ? 'Waiting for your wallet…' : 'No wallet? Any public address can be inspected without one.'}{' '}
+          <button type="button" className="text-ice hover:underline underline-offset-4" onClick={() => setMode('explore')}>
+            Explore an address
+          </button>
+        </p>
       </>
     );
   }
+
+  const tags =
+    mode === 'explore' ? (
+      <StatusTag state={explored ? 'live' : 'disconnected'} detail={explored ? 'PUBLIC ADDRESS' : undefined} />
+    ) : connected ? (
+      <StatusTag state="wallet" detail={connected.networkName.toUpperCase()} />
+    ) : view.status === 'unavailable' ? (
+      <StatusTag state="unavailable" detail="NO WALLET DETECTED" />
+    ) : view.status === 'connecting' ? (
+      <StatusTag state="loading" detail="AWAITING WALLET" />
+    ) : (
+      <StatusTag state="disconnected" />
+    );
 
   return (
     <SectionShell
@@ -175,20 +186,25 @@ export function LumenIndexSection() {
       number="03"
       label="LUMEN_INDEX"
       seed={37}
-      title="Your public address, read on your terms."
+      title="Public balances, read on your terms."
       intro={
         <>
           <p>
-            Connect an injected wallet such as MetaMask and this index reads the address it shares, the network it is on, and its native ETH
-            balance on Ethereum Mainnet. Nothing is requested until you click connect.
+            Inspect native ETH and verified ERC-20 balances (USDC, DAI, WETH) on Ethereum Mainnet, either for the wallet you connect or for
+            any public address you paste. Nothing is requested from a wallet until you click connect.
           </p>
-          <p>No signatures, no transactions, no USD valuations, and nothing about your wallet is stored by this site.</p>
+          <p>No signatures, no transactions, no USD valuations, and no addresses stored by this site.</p>
         </>
       }
-      tags={<SectionTags view={view} balance={balance} />}
+      tags={tags}
     >
       <div ref={pulseRef} className="wallet-panel" data-wallet={view.status}>
-        <Frame className="p-6 md:p-8">{panel}</Frame>
+        <Frame className="p-6 md:p-8">
+          <ModeTabs mode={mode} onChange={setMode} panelId={panelId} />
+          <div id={panelId} role="tabpanel" aria-label={mode === 'wallet' ? 'Connected wallet' : 'Explore address'}>
+            {panel}
+          </div>
+        </Frame>
       </div>
     </SectionShell>
   );

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -17,5 +17,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.{ts,tsx}'],
+    // Real-network checks run only via `npm run test:live` (vitest.live.config.ts).
+    exclude: [...configDefaults.exclude, 'src/**/*.live.test.ts'],
   },
 });

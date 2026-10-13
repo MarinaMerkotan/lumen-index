@@ -2,9 +2,13 @@
 
 An immersive, **frontend-only Web3 engineering showcase**. Built to demonstrate wallet connectivity, public blockchain reads, transparent demo simulations, and refined motion design.
 
-> **Project status:** Milestone 2 (read-only Web3). Live Ethereum Mainnet telemetry and a user-initiated injected-wallet connection are real. Liquidity Pools and Governance remain labelled placeholders for Milestone 3. Nothing writes to a chain, nothing asks for a signature, and no wallet data is stored. This is not a bank, investment service, or deployed DeFi protocol.
+> **Project status:** Milestone 3A (blockchain & asset explorer) on top of M2 (read-only Web3). Live Ethereum Mainnet telemetry and a user-initiated injected-wallet connection are real. Liquidity Pools and Governance remain labelled placeholders for Milestone 3. Nothing writes to a chain, nothing asks for a signature, and no wallet data is stored. This is not a bank, investment service, or deployed DeFi protocol.
 
 ## What ships today
+- **Block explorer (LIVE):** the 10 latest Ethereum Mainnet blocks (age, tx count, gas used, base fee), selectable for a detail view (hash, UTC/local time, gas used/limit, base fee, fee recipient, Etherscan link). Headers are cached per block (immutable) and read at most 3 at a time; transactions are never fetched in full.
+- **Base-fee chart (LIVE):** 20 observed base fees from one `eth_feeHistory` call per new block, plus the protocol-computed next-block fee drawn as a dashed outline. Missing values are gaps, never interpolated. Hover/focus tooltips, arrow-key navigation, and selection linked to the block list and schematic.
+- **Transaction lookup (LIVE):** strictly validated hash, then `eth_getTransactionByHash` + `eth_getTransactionReceipt`: success / reverted / pending (re-checked for ~5 min) / not found, from/to, value, gas used, effective gas price and fee paid, block and confirmations, Etherscan link. Standard ERC-20 `Transfer`/`Approval` events are decoded with viem's ERC-20 ABI (allowlisted tokens with symbol and decimals, others in raw base units); everything else is shown as raw metadata.
+- **Asset explorer (LIVE):** *Connected wallet* and *Explore address* modes kept visibly separate. ETH plus verified USDC / DAI / WETH balances and total supply, read from Ethereum Mainnet in one Multicall3 `eth_call`; on-chain decimals are cross-checked against the allowlist. Inspected addresses are never stored.
 - **Ecosystem (LIVE):** chain ID (verified from the RPC), latest block with Etherscan link and age, base fee, suggested priority tip, and block fullness, read from Ethereum Mainnet through a public RPC without a wallet. Polling follows the ~12 s block time, pauses in background tabs, and backs off on errors (30 s) or rate limiting (60 s). Failures show `ERROR` with a retry action and a clearly labelled last successful read; old data is shown as `STALE`, never as current.
 - **Wallet (WALLET):** injected EIP-1193 wallets (MetaMask and others via EIP-6963 discovery). Connect, disconnect and switch-to-Mainnet run only on click. The UI shows the real address (copy + Etherscan), the wallet's actual network, and clear states for no wallet, waiting, rejected, pending, wrong network, and errors.
 - **Lumen Index (LIVE):** native ETH balance on Ethereum Mainnet for the connected address, formatted from bigint with viem, truncated rather than rounded, with no USD valuation. On other networks the balance is still read from Mainnet and labelled as such.
@@ -22,13 +26,14 @@ src/
   components/sections/    # shared section shell
   components/ui/          # StatusTag, Frame, Readout, SectionLabel
   content/navigation.ts   # nav labels -> fragment ids
-  features/ecosystem/     # live telemetry hook, state derivation, block pulse emitter
+  features/ecosystem/     # telemetry, recent blocks, fee chart, block detail, pulse emitter
   features/wallet/        # wallet controller/context, view derivation, controls
-  features/assets/        # Lumen Index + Mainnet balance hook
+  features/assets/        # Lumen Index asset explorer, ETH + ERC-20 balance hooks
+  features/transactions/  # transaction lookup, status and log decoding
   features/liquidity|governance/  # M3 placeholders
   hooks/                  # reduced motion, in-view, active section, pointer field, pulses, clock
   lib/web3/               # wagmi config, RPC URL resolution, error classification
-  lib/chains/ lib/format/ # network names + explorer URLs, bigint-safe formatters
+  lib/chains/ lib/format/ # network names, explorer URLs, ERC-20 allowlist, bigint-safe formatters
   lib/                    # fragment ids, ambient timing, status vocabulary, pulse bus
 ```
 
@@ -38,7 +43,7 @@ src/
 - Tailwind CSS 3
 - lucide-react
 - wagmi 3.7.7, viem 2.56.9, @tanstack/react-query 5.103.2 (Ethereum Mainnet only, injected connector only)
-- Vitest (dev only): formatting, wallet/RPC state, component state rendering, and a source-level security guard
+- Vitest (dev only): `npm test` runs offline unit, render and jsdom interaction tests plus a source-level read-only guard; `npm run test:live` runs opt-in checks against real Ethereum Mainnet
 
 ## Local development
 Requires a supported Node.js LTS release (CI uses Node 22).
@@ -47,6 +52,7 @@ Requires a supported Node.js LTS release (CI uses Node 22).
 npm ci
 npm run dev
 npm test
+npm run test:live   # optional, uses the public RPC
 npm run build
 npm run preview
 ```
