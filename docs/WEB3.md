@@ -1,4 +1,6 @@
-# Web3 architecture — proposed, not yet installed
+# Web3 architecture
+
+> **Status (M2):** installed `wagmi@3.7.7`, `viem@2.56.9`, `@tanstack/react-query@5.103.2`. Mainnet-only config in `src/lib/web3/config.ts` (injected connector + EIP-6963 discovery, `storage: null`), default RPC `https://ethereum-rpc.publicnode.com`. Simulations remain M3.
 
 ## Constraints and implementation selection
 - Current runtime: Vite + React client-only. Keep it that way.
