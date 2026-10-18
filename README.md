@@ -1,95 +1,103 @@
 # LŪMEN // ÍNDEX
 
-An immersive, **frontend-only Web3 engineering showcase**. Built to demonstrate wallet connectivity, public blockchain reads, transparent demo simulations, and refined motion design.
+**Public chains. Luminous interfaces.**
 
-> **Project status:** feature-complete portfolio release candidate (M1–M4). Live read-only Ethereum Mainnet data, explorers and user-initiated wallet access are real; Liquidity Pools and Governance are clearly labelled local demos; the only signature request is the opt-in Signature Lab message. Nothing writes to a chain and no wallet data is stored. This is not a bank, investment service, or deployed DeFi protocol. **Open release blocker:** hero video rights (see *Assets and privacy*).
+[![LUMEN // INDEX — immersive Web3 showcase preview](docs/lumen-index-preview.png)](https://lumen-index-web3.vercel.app)
 
-## What ships today
-- **Liquidity Pools (DEMO — NO FUNDS):** a local constant-product (x · y = k) simulator with editable reserves, swap amount, direction and illustrative fee (default 0.3%). Shows output, spot price before/after, price impact and new reserves, with an SVG curve whose before/after points move with the inputs. Bigint fixed-point math (18 decimals), strict input validation, reset to defaults.
-- **Governance (DEMO — NOT ON-CHAIN):** one illustrative proposal with FOR / AGAINST / ABSTAIN. Cast, change or reset a vote held in React state; the result shows only this visitor's single local vote and clears on reload.
-- **Signature Lab (EXPERIMENTAL, OPT-IN):** with a connected wallet, shows a readable message (app name, origin, random challenge, explicit "authorizes nothing, not a login" statement), asks for consent, then requests one EIP-191 `personal_sign`. The signer is recovered and compared locally with viem; nothing is sent or stored. Ordinary accounts (EOAs) only: smart-contract wallet signatures (ERC-1271) are reported as not verifiable locally.
-- **Block explorer (LIVE):** the 10 latest Ethereum Mainnet blocks (age, tx count, gas used, base fee), selectable for a detail view (hash, UTC/local time, gas used/limit, base fee, fee recipient, Etherscan link). Headers are cached per block (immutable) and read at most 3 at a time; transactions are never fetched in full.
-- **Base-fee chart (LIVE):** 20 observed base fees from one `eth_feeHistory` call per new block, plus the protocol-computed next-block fee drawn as a dashed outline. Missing values are gaps, never interpolated. Hover/focus tooltips, arrow-key navigation, and selection linked to the block list and schematic.
-- **Transaction lookup (LIVE):** strictly validated hash, then `eth_getTransactionByHash` + `eth_getTransactionReceipt`: success / reverted / pending (re-checked for ~5 min) / not found, from/to, value, gas used, effective gas price and fee paid, block and confirmations, Etherscan link. Standard ERC-20 `Transfer`/`Approval` events are decoded with viem's ERC-20 ABI (allowlisted tokens with symbol and decimals, others in raw base units); everything else is shown as raw metadata.
-- **Asset explorer (LIVE):** *Connected wallet* and *Explore address* modes kept visibly separate. ETH plus verified USDC / DAI / WETH balances and total supply, read from Ethereum Mainnet in one Multicall3 `eth_call`; on-chain decimals are cross-checked against the allowlist. Inspected addresses are never stored.
-- **Ecosystem (LIVE):** chain ID (verified from the RPC), latest block with Etherscan link and age, base fee, suggested priority tip, and block fullness, read from Ethereum Mainnet through a public RPC without a wallet. Polling follows the ~12 s block time, pauses in background tabs, and backs off on errors (30 s) or rate limiting (60 s). Failures show `ERROR` with a retry action and a clearly labelled last successful read; old data is shown as `STALE`, never as current.
-- **Wallet (WALLET):** injected EIP-1193 wallets (MetaMask and others via EIP-6963 discovery). Connect, disconnect and switch-to-Mainnet run only on click. The UI shows the real address (copy + Etherscan), the wallet's actual network, and clear states for no wallet, waiting, rejected, pending, wrong network, and errors.
-- **Lumen Index (LIVE):** native ETH balance on Ethereum Mainnet for the connected address, formatted from bigint with viem, truncated rather than rounded, with no USD valuation. On other networks the balance is still read from Mainnet and labelled as such.
-- **Live motion:** each new block ripples the hero grid, fires a light burst along the telemetry connector, and pulses the newest block in the Ecosystem schematic. A wallet connection lights the connectivity path and the Lumen Index panel, and a linked state settles back to neutral on disconnect. RPC failure dims the telemetry node. Pulses are CSS class toggles (no React re-render per frame) and are skipped under `prefers-reduced-motion` or **Pause motion**.
-- M1 foundation: original hero and video with static fallback, ambient CSS/SVG motion, four sections plus `#disclosure`, skip link, focus management.
+[**↗ Live demo**](https://lumen-index-web3.vercel.app) · [Features](#features) · [Tech stack](#tech-stack) · [Run locally](#run-locally)
 
-## Source layout
-```text
-src/
-  App.tsx                 # page composition
-  components/ambient/     # motion context, grid field, crosshairs, node squares, page grid
-  components/hero/        # hero, media + fallback, annotations, CTA footer
-  components/layout/      # site header, mobile menu, footer/disclosure
-  components/providers/   # WagmiProvider + QueryClientProvider
-  components/sections/    # shared section shell
-  components/ui/          # StatusTag, Frame, Readout, SectionLabel
-  content/navigation.ts   # nav labels -> fragment ids
-  features/ecosystem/     # telemetry, recent blocks, fee chart, block detail, pulse emitter
-  features/wallet/        # wallet controller/context, view derivation, controls
-  features/assets/        # Lumen Index asset explorer, ETH + ERC-20 balance hooks
-  features/transactions/  # transaction lookup, status and log decoding
-  features/liquidity|governance/  # M3 placeholders
-  hooks/                  # reduced motion, in-view, active section, pointer field, pulses, clock
-  lib/web3/               # wagmi config, RPC URL resolution, error classification
-  lib/chains/ lib/format/ # network names, explorer URLs, ERC-20 allowlist, bigint-safe formatters
-  lib/                    # fragment ids, ambient timing, status vocabulary, pulse bus
-```
+An immersive, **frontend-only Web3 engineering showcase** combining real Ethereum Mainnet data, wallet connectivity, blockchain exploration and interactive cryptography labs. Built with React and TypeScript — no application backend, database or custody; Google Analytics only counts visits.
 
-## Stack
-- React 18 + TypeScript
-- Vite 5
-- Tailwind CSS 3
-- lucide-react
-- wagmi 3.7.7, viem 2.56.9, @tanstack/react-query 5.103.2 (Ethereum Mainnet only, injected connector only)
-- Vitest (dev only): `npm test` runs offline unit, render and jsdom interaction tests plus a source-level read-only guard; `npm run test:live` runs opt-in checks against real Ethereum Mainnet
+> **What is real?** Chain data and balances are fetched from Ethereum Mainnet. Liquidity and governance examples are clearly labeled local simulations. All blockchain interactions are read-only, except for a separately consented, plain-text message-signing demonstration. No transactions, swaps, approvals or transfers.
 
-## Local development
-Requires a supported Node.js LTS release (CI uses Node 22).
+## Features
 
-```bash
+| Module | What you can explore |
+| --- | --- |
+| **01 / Ecosystem** | Live block telemetry, 10 recent Ethereum blocks, block details, interactive base-fee history and transaction lookup with ERC-20 event decoding. |
+| **02 / Liquidity Pools** | Local constant-product AMM simulator: adjustable reserves, swap amount, direction and fee; output, spot prices, price impact and a reactive SVG curve. **Demo — no funds.** |
+| **03 / Lumen Index** | Connect MetaMask or another injected EIP-1193 wallet, or inspect any public Ethereum address without connecting. View Mainnet ETH, USDC, DAI and WETH balances. |
+| **04 / Governance** | Cast, change and reset a single local demo vote. Opt-in Signature Lab demonstrates EIP-191 message signing and local signer verification with viem. **Not an on-chain vote or login.** |
+
+**Motion is part of the data experience.** New blocks, wallet state changes, exploration and interactions trigger subtle SVG/CSS signals throughout the interface. Animations honor `prefers-reduced-motion` and can be paused manually.
+
+## Tech stack
+
+| Area | Technologies |
+| --- | --- |
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS |
+| Web3 | wagmi, viem, injected wallets (EIP-1193 / EIP-6963), Ethereum JSON-RPC, ERC-20, Multicall3 |
+| Data | TanStack Query, typed read-only RPC calls, bigint-safe amount formatting |
+| UI & motion | CSS animations, SVG, lucide-react, accessibility and responsive layouts |
+| Quality | Vitest, browser interaction tests, opt-in live Mainnet tests, GitHub Actions CI |
+| Hosting | Static frontend on Vercel |
+
+## Run locally
+
+Requires Node.js 22 and npm.
+
+~~~bash
+git clone https://github.com/MarinaMerkotan/lumen-index.git
+cd lumen-index
 npm ci
 npm run dev
-npm test
-npm run test:live   # optional, uses the public RPC
-npm run build
-npm run preview
-```
+~~~
 
-No backend, database, credentials, or wallet are needed to run the current build.
+Open the localhost URL shown by Vite. No API keys, database or wallet are needed to explore the public blockchain sections.
 
-## Assets and privacy
-- **Hero video (release blocker):** streamed from a third-party CloudFront URL (`HeroMedia.tsx`, MP4 ~7.4 MB). Ownership and licence are **not confirmed**; it is not copied into the repo. A static luminous fallback appears if it fails or stalls, and it does not autoplay under reduced motion. Confirm rights or provide an owned replacement before public launch.
-- **Fonts:** Hanken Grotesk (display, weight 340) and Manrope (UI), both SIL OFL 1.1 via Google Fonts. The earlier Graphik webfont from onlinewebfonts.com was removed because its licence could not be confirmed.
-- **Third parties:** the public RPC (`https://ethereum-rpc.publicnode.com`) sees visitor IP addresses and every query, including connected, inspected or looked-up addresses and hashes. Google Fonts and the video CDN receive standard requests. Wallet extensions see the requests this site makes. The app itself stores nothing (no app-side storage or cookies).
-- **Analytics:** Google Analytics 4 (`G-HWLTMJDD76`, snippet in `index.html`) counts page visits only. It sets Google's own `_ga` cookies and receives standard browser data (IP address, device, referrer, page URL — which carries only `#section` anchors). No custom events: nothing typed, inspected, connected or signed is sent to it. There is no consent banner by owner decision.
-- Override the RPC with an **https** `VITE_MAINNET_RPC_URL` (see `.env.example`); every `VITE_*` value ships to browsers, so never put an API key or secret there.
+The default keyless RPC is `https://ethereum-rpc.publicnode.com`. To select another **public HTTPS** endpoint, add an optional `VITE_MAINNET_RPC_URL` to `.env.local` (see [`.env.example`](.env.example)). Never put secrets in `VITE_*` variables — Vite exposes them to browsers.
 
-## Deployment (Vercel, static)
-- Framework preset: **Vite**. Build command: `npm run build`. Output directory: `dist`. Install: `npm ci`. Node 22 (matches CI).
-- Single-page app with in-page `#anchors` only: no client-side routes, no rewrites and no serverless functions needed. A refresh on any `#section` URL serves `index.html`.
-- No environment variables are required. Optional: `VITE_MAINNET_RPC_URL` (public https URL only).
-- Production smoke test after deploy: open the site in a private window → hero video plays (or fallback appears) → Ecosystem shows `LIVE` with a block number advancing every ~12 s → pick a block and inspect its first transaction → Explore Address with any public address shows ETH/USDC/DAI/WETH → AMM output updates while typing → cast/reset a local vote → without a wallet, CONNECT WALLET opens the "No wallet detected" help → with a throwaway wallet: connect, switch network, sign the lab message (verified), disconnect → reload a `#governance` URL.
+### Tests & build
 
-## Known limitations
-- Signature Lab verifies ordinary accounts (EOAs) only; smart-contract wallet signatures (ERC-1271/6492) are reported as "not verifiable locally".
-- ERC-20 balances cover the verified allowlist (USDC, DAI, WETH); other tokens in transaction logs are shown in raw base units. No ENS, no other networks, no WalletConnect.
-- Data depends on one public RPC; outages show `ERROR` / `STALE` with retry rather than switching providers.
-- `npm audit`: 0 production vulnerabilities; 13 development-only advisories (Vite 5 / esbuild dev server, Vitest 2 / tinypool, Tailwind 3 tooling chain). Fixes require major upgrades (Vite 8, Vitest 5, Tailwind 4) and none ship in the static bundle.
+~~~bash
+npm test             # offline unit, component and interaction tests
+npm run test:live    # opt-in: real Ethereum Mainnet RPC checks
+npm run build        # TypeScript + production Vite build
+npm run preview      # serve the production build locally
+~~~
 
-## Agent handoff
-Start with [AGENTS.md](AGENTS.md) and the documentation below:
+Live checks require RPC access and may be affected by public-provider rate limits.
 
-- [Product scope](docs/PRODUCT.md)
-- [Design and motion language](docs/DESIGN.md)
-- [Web3 architecture](docs/WEB3.md)
-- [Security and privacy](docs/SECURITY.md)
-- [Milestone backlog](docs/TASKS.md)
-- [Ready-to-use agent prompts](docs/AGENT_PROMPTS.md)
+## Architecture
 
-## Release policy
-No financial promises, invented user memberships, fake account positions, real-money transaction flows, or opaque signature requests. Every visualized figure must be labeled according to its source: live, illustrative, or unavailable.
+~~~text
+src/
+├── components/
+│   ├── ambient/       # geometric motion and shared motion state
+│   ├── hero/          # luminous hero, annotations and media fallback
+│   ├── layout/        # header, navigation and disclosures
+│   └── ui/            # shared technical UI primitives
+├── features/
+│   ├── ecosystem/     # live blocks, fees, selectable block details
+│   ├── transactions/  # transaction receipt and event inspection
+│   ├── assets/        # public address and ERC-20 balance explorer
+│   ├── wallet/        # wallet discovery, connect and account state
+│   ├── liquidity/     # local AMM calculations and interactive curve
+│   ├── governance/    # local single-user vote
+│   └── signature-lab/ # consented message signing and local verification
+├── lib/               # chains, RPC config, formatters and utilities
+└── live/              # optional real-Mainnet tests
+~~~
+
+Mined block headers are cached, reads are bounded, and RPC failures are surfaced as loading, stale or error states rather than fabricated figures. No backend or indexer is required.
+
+## Safety & privacy
+
+- Wallet access is user-initiated. The application never requests seed phrases, private keys, token approvals or blockchain write transactions.
+- The Signature Lab is optional and signs only the **exact, human-readable test message** displayed on screen after explicit consent. Verification happens locally; it does not authorize anything or log anyone in.
+- Liquidity and governance are browser-only demos, not financial services or real on-chain interactions.
+- The application does not persist wallet addresses, inspected addresses, votes or signatures. The public RPC, external fonts and video CDN may receive ordinary network-request metadata, including public addresses sent in RPC queries.
+- **Analytics:** Google Analytics 4 (`G-HWLTMJDD76`, snippet in `index.html`) counts page visits only. It sets Google's own `_ga` cookies and receives standard browser data (IP address, device, referrer, page URL with `#section` anchors only). No custom events: nothing typed, inspected, connected or signed is sent to it. No consent banner, by owner decision.
+- **Media:** the hero is streamed from a third-party video URL, with a static fallback. The right to reuse that particular video has not been independently confirmed. See [security and asset notes](docs/SECURITY.md).
+
+## Deployment
+
+Hosted as a static Vite app on [Vercel](https://vercel.com): build with `npm run build`, publish `dist`, use Node.js 22. No serverless functions or required environment variables. The [live demo](https://lumen-index-web3.vercel.app) is the portfolio-facing experience.
+
+**Scope:** Ethereum Mainnet only; no ENS or WalletConnect, no USD pricing or cross-chain portfolio aggregation. The Signature Lab locally verifies ordinary EOA signatures; contract-wallet signatures are not verified in this demo.
+
+Further context: [Product](docs/PRODUCT.md) · [Design](docs/DESIGN.md) · [Web3](docs/WEB3.md) · [Security](docs/SECURITY.md) · [Agent guidelines](AGENTS.md).
+
+---
+
+*LUMEN // INDEX is an independent frontend/Web3 portfolio demonstration, not a bank, investment service or deployed DeFi protocol.*
