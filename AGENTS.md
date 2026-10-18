@@ -15,7 +15,7 @@ Build an elegant **frontend-only Web3 engineering showcase**, not a bank, invest
 
 ## Non-negotiables
 1. **Preserve the original aesthetic.** Black canvas, icy-blue accents (#AFDDFF), restraint, wide negative space, fine grid, annotation/crosshair language, the floating luminous video subject. Do not introduce generic dashboard cards, gradients, giant rounded components, or unrelated stock visuals.
-2. Do not introduce a backend, database, auth service, serverless functions, analytics, cookies or app-side wallet-data persistence unless the owner explicitly approves.
+2. Do not introduce a backend, database, auth service, serverless functions, additional analytics, cookies or app-side wallet-data persistence unless the owner explicitly approves. The owner-approved Google Analytics page-view snippet in `index.html` stays; do not add custom events or send wallet/user-entered data to it, and do not add a consent banner without asking.
 3. Never request or handle a seed phrase, private key, or secret. No payments, investments, approvals, swaps, or real mainnet write transactions. Mainnet is read-only.
 4. Never auto-connect or auto-prompt for wallet signature. Signature experiments require a dedicated opt-in action and readable message. Do not make status claims about wallet identity or authentication.
 5. Differentiate `LIVE`, `DEMO`, `DISCONNECTED`, `UNAVAILABLE`, and `LOADING`. Never silently substitute mock data for failed RPC.

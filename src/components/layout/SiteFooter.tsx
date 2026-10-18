@@ -20,7 +20,7 @@ export function SiteFooter() {
 
         <div className="lg:col-span-4 font-manrope text-white/60 text-[13px] leading-[21px] space-y-4">
           <p>
-            A frontend-only engineering showcase. There is no backend, account system, analytics, cookies or app-side storage, and it is not a bank,
+            A frontend-only engineering showcase. There is no backend, account system or app-side storage, and it is not a bank,
             custodian, exchange or investment service. Nothing here is financial advice.
           </p>
           <p>
@@ -30,7 +30,8 @@ export function SiteFooter() {
           <p>
             Third-party requests: chain data is read from the public RPC at {rpcHost(MAINNET_RPC_URL)}, which sees your IP address and the
             queries made, including your public address once you connect and any address or transaction hash you inspect. Your wallet extension sees this site&rsquo;s requests. The hero video is
-            served from an external CDN and fonts from Google Fonts and onlinewebfonts.com.
+            served from an external CDN and fonts from Google Fonts. Google Analytics counts page visits: it sets Google&rsquo;s own cookies and
+            sees standard browser data such as IP address, device and referrer, but nothing you type, inspect or connect here.
           </p>
         </div>
 

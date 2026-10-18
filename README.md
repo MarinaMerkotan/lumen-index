@@ -65,7 +65,8 @@ No backend, database, credentials, or wallet are needed to run the current build
 ## Assets and privacy
 - **Hero video (release blocker):** streamed from a third-party CloudFront URL (`HeroMedia.tsx`, MP4 ~7.4 MB). Ownership and licence are **not confirmed**; it is not copied into the repo. A static luminous fallback appears if it fails or stalls, and it does not autoplay under reduced motion. Confirm rights or provide an owned replacement before public launch.
 - **Fonts:** Hanken Grotesk (display, weight 340) and Manrope (UI), both SIL OFL 1.1 via Google Fonts. The earlier Graphik webfont from onlinewebfonts.com was removed because its licence could not be confirmed.
-- **Third parties:** the public RPC (`https://ethereum-rpc.publicnode.com`) sees visitor IP addresses and every query, including connected, inspected or looked-up addresses and hashes. Google Fonts and the video CDN receive standard requests. Wallet extensions see the requests this site makes. No analytics, cookies or app-side storage.
+- **Third parties:** the public RPC (`https://ethereum-rpc.publicnode.com`) sees visitor IP addresses and every query, including connected, inspected or looked-up addresses and hashes. Google Fonts and the video CDN receive standard requests. Wallet extensions see the requests this site makes. The app itself stores nothing (no app-side storage or cookies).
+- **Analytics:** Google Analytics 4 (`G-HWLTMJDD76`, snippet in `index.html`) counts page visits only. It sets Google's own `_ga` cookies and receives standard browser data (IP address, device, referrer, page URL — which carries only `#section` anchors). No custom events: nothing typed, inspected, connected or signed is sent to it. There is no consent banner by owner decision.
 - Override the RPC with an **https** `VITE_MAINNET_RPC_URL` (see `.env.example`); every `VITE_*` value ships to browsers, so never put an API key or secret there.
 
 ## Deployment (Vercel, static)

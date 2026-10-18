@@ -33,7 +33,7 @@ Hero: immersive video backdrop, grid/connection motion, genuine wallet control, 
 - Connecting/disconnecting is user initiated. Support rejected requests, wrong chain, wallet unavailable, network latency, and provider disconnect.
 - Show network/data timestamps only when meaningful, otherwise show explicitly that data is unavailable.
 - At small widths the mobile menu closes on nav use/Escape; anchors scroll to real sections; keyboard focus remains sensible.
-- Ship no analytics, ads, user accounts, off-chain PII store, API service, or back-office.
+- Ship no ads, user accounts, off-chain PII store, API service, or back-office. The only analytics is Google Analytics page-view counting (owner-approved, disclosed in the footer, no custom events).
 - Prefer honest source links (chain explorer, docs) over fabricated reports.
 
 ## Out of scope

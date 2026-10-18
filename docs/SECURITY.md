@@ -1,12 +1,12 @@
 # Security, privacy and release policy
 
 ## Trust model
-Everything runs in the visitor's browser; there is no app-owned backend, database, analytics or app-side user-data storage in scope. **This does not mean third parties see no data.** The initial page requests externally hosted video and fonts. Browser-based RPC or wallet-connection vendors may observe standard connection metadata (including IP addresses), requested chain data, and public wallet addresses.
+Everything runs in the visitor's browser; there is no app-owned backend, database or app-side user-data storage in scope. **This does not mean third parties see no data.** The initial page requests externally hosted video and fonts, and loads Google Analytics 4 to count visits (Google sets its own `_ga` cookies; no custom events, no consent banner by owner decision). Browser-based RPC or wallet-connection vendors may observe standard connection metadata (including IP addresses), requested chain data, and public wallet addresses.
 
 ## Prohibited
 - No seed phrases, private keys, wallet import forms, secret injection, custody, or transaction signing on mainnet.
 - No approvals, swaps, permits, bridge links, real investments, guaranteed APYs, fake live portfolio values, fake membership/account statuses, fake vote tallies, or misleading financial claims.
-- No storing wallet address, message, signature, balances, or votes in localStorage, sessionStorage, cookies, database, logs or analytics under the project scope. Wallet SDKs/providers may retain their own connection state; document and configure that separately.
+- No storing wallet address, message, signature, balances, or votes in localStorage, sessionStorage, cookies, database, logs or analytics under the project scope. Google Analytics receives standard page-view data only — never send it custom events or parameters containing wallet or user-entered data. Wallet SDKs/providers may retain their own connection state; document and configure that separately.
 - No blind signature prompts. Show the exact human-readable message **before** asking wallet to sign, explain why, and give an explicit cancel path.
 - Never put secrets in Git, `VITE_*` env vars or public client JS. Assume Vite env values ship to browsers.
 
@@ -31,7 +31,7 @@ Status at M4:
 - [x] Mainnet cannot send a write transaction (no write/transaction hooks; enforced by `src/security.test.ts`).
 - [x] No fake connected/member labels remain.
 - [x] All simulation data explicitly labeled demo.
-- [x] Third-party data flows documented in README/disclosure (RPC, video CDN, Google Fonts, wallet extension).
+- [x] Third-party data flows documented in README/disclosure (RPC, video CDN, Google Fonts, Google Analytics, wallet extension).
 - [x] No user data intentionally persisted by this app (wagmi `storage: null`; no storage APIs; tested).
 - [x] Wallet flows handle rejection, disconnect and wrong chain (automated + mock-provider browser QA). **Real-extension QA: owner to confirm.**
 - [x] No unsolicited prompt, signature, or transaction modal; the only signature is the consent-gated Signature Lab message.
